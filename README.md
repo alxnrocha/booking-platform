@@ -1,5 +1,6 @@
 # StayHub — Plataforma de Reservas de Lujo y Alquiler Vacacional Multi-Tenant con RBAC
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-success?style=flat-square&logo=github&logoColor=white)](https://alxnrocha.github.io/booking-platform/)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -9,21 +10,22 @@
 [![Recharts](https://img.shields.io/badge/Recharts-3.0-22C55E?style=flat-square)](https://recharts.org/)
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Zustand](https://img.shields.io/badge/Zustand-5.0-4338CA?style=flat-square)](https://github.com/pmndrs/zustand)
-[![Zod](https://img.shields.io/badge/Zod-Validation-3E67B1?style=flat-square&logo=zod&logoColor=white)](https://zod.dev/)
 [![Vitest](https://img.shields.io/badge/Tested_with-Vitest-FCC72B?style=flat-square&logo=vitest&logoColor=black)](https://vitest.dev/)
 [![Oxlint](https://img.shields.io/badge/Linter-Oxlint-orange?style=flat-square)](https://oxc.rs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-> **Proyecto 15 del Portafolio Profesional** — Plataforma Multi-Tenant de alquiler vacacional y gestión de reservas de alta gama (inspirada en Airbnb / Luxury Stays) con control de acceso basado en roles (Guest / Host / Admin), motor transaccional con prevención de doble reserva, galería masonry de 5 fotos y portal analítico para anfitriones.
+> **Proyecto 15 del Portafolio Profesional** — Plataforma Multi-Tenant de alquiler vacacional y gestión de reservas de alta gama (inspirada en Airbnb / Luxury Stays) con control de acceso basado en roles (Guest / Host / Admin), motor transaccional con prevención de doble reserva, selector interactivo de fechas de doble mes, galería masonry de 5 fotos, experiencia 100% mobile-first y portal analítico para anfitriones.  
+> 🔗 **Demo en Vivo en GitHub Pages:** [https://alxnrocha.github.io/booking-platform/](https://alxnrocha.github.io/booking-platform/)
 
 ---
 
 ## 🌟 Visión General & Propuesta de Valor
 
 **StayHub** es una aplicación integral para la exploración, reserva y gestión de estancias turísticas de lujo a nivel global:
-- **Huéspedes (Guest Experience):** Búsqueda facetada por destino, rango de fechas y número de viajeros, carrusel de fotografías en alta resolución, desglose transparente de tarifas y gestión integral de viajes reservados con voucher digital.
+- **Huéspedes (Guest Experience):** Búsqueda facetada por destino, rango de fechas con visualización de dos meses simultáneos, carrusel de fotografías en alta resolución, desglose transparente de tarifas y gestión integral de viajes reservados con voucher digital.
 - **Anfitriones (Host Portal):** Panel de control con métricas clave (ingresos mensuales, ocupación, huéspedes activos y valoración), gráfico interactivo de trayectoria de facturación y matriz de disponibilidad con bloqueo de fechas por mantenimiento.
-- **Administración & Plataforma:** Modelo de datos relacional con control de concurrencia para evitar solapamientos (*double booking*) y arquitectura desacoplada y escalable.
+- **Experiencia 100% Mobile-First:** Barra de búsqueda compacta para móviles, drawer modal de búsqueda a pantalla completa y barra inferior fija de navegación (*Bottom Nav*).
+- **Control de Concurrencia Relacional:** Motor de reserva atómico que previene el solapamiento de fechas (*double booking*) en tiempo real.
 
 ---
 
@@ -32,33 +34,41 @@
 1. **🎨 Diseño Dark Luxury & Experiencia de Usuario:**
    - Paleta cromática refinada con fondo Dark Slate (`#0A0F1D`, `#0F172A`), tarjetas con microbordes (`#1E293B`) y acentos en Rose Coral (`#FF385C`), Esmeralda (`#10B981`) y Oro (`#F59E0B`).
    - Tipografía contemporánea combinando *Plus Jakarta Sans*, *Inter* y *Playfair Display*.
+   - Contenedores anchos (`max-w-[1720px]`) que aprovechan la totalidad de pantallas panorámicas.
 
-2. **🔍 Barra de Búsqueda Flotante & Conmutador RBAC:**
+2. **🔍 Barra de Búsqueda Flotante & Selector de Doble Mes (Dual-Month):**
    - Buscador flotante tipo pastilla con popovers integrados para **Destino** (con sugerencias de búsqueda rápida), **Rango de Fechas** y contador dinámico de **Huéspedes**.
+   - **Calendario de Doble Mes (`DateRangePickerPopover.tsx`):** Muestra dos meses consecutivos lado a lado con selección fluida de Check-in y Check-out, sombreado de rango continuo, atajos rápidos de fin de semana / semanas y formato limpio (`Jun 9 – 13`).
    - Menú de usuario con conmutador de roles en tiempo real (**Guest Mode**, **Host / Superhost** y **Platform Admin**).
 
-3. **🏖️ Carrusel de Categorías & Modal de Filtros:**
+3. **📱 Experiencia Móvil 100% Optimizada (< 520px):**
+   - **Pastilla de búsqueda móvil:** Acceso directo visible en cabecera en smartphones.
+   - **Modal de búsqueda móvil (`MobileSearchModal.tsx`):** Panel a pantalla completa para selección rápida de destino, fechas y huéspedes.
+   - **Barra de navegación inferior (`MobileBottomNav.tsx`):** Botones flotantes inferiores para *Explore*, *My Trips* (con badge numérico de viajes activos) y *Host Hub*.
+
+4. **🏖️ Carrusel de Categorías & Opción "All Stays":**
+   - Opción inicial **"All Stays"** que despliega todas las 8 propiedades de lujo al cargar el sitio.
    - Barra horizontal con 10 categorías temáticas: *Beachfront, Modern Cabins, Luxury Villas, Infinity Pools, Tiny Homes, Treehouses, Design Homes, Lakefront, Ski Chalets, Amazing Views*.
    - Modal de filtros avanzados con selector de rango de precios (€0 – €1.500+), filtro exclusivo de Superhost y conmutador de Reserva Instantánea.
 
-4. **🏡 Cuadrícula de Descubrimiento (Marketplace Grid):**
+5. **🏡 Cuadrícula de Descubrimiento (Marketplace Grid):**
    - Cuadrícula responsiva de 4 columnas con tarjetas interactivas: carrusel fotográfico con controles de paginación por puntos, botón de favoritos con persistencia de estado, distintivo Superhost, ubicación y precio por noche.
 
-5. **📸 Página de Detalles & Galería Masonry 5-Fotos:**
+6. **📸 Página de Detalles & Galería Masonry 5-Fotos:**
    - Cabecera con migas de pan dinámicas, distintivo Superhost, valoraciones verificadas y acciones de Compartir y Guardar.
    - Cuadrícula fotográfica tipo masonry (1 foto principal de impacto + 4 fotos secundarias) con modal lightbox interactivo para visualización individual o en cuadrícula.
    - Ficha del anfitrión (*Hosted by Marco Rossi*), desglose de dormitorios (*Where you'll sleep*), cuadrícula de comodidades de lujo (Wi-Fi 500 Mbps, cargador EV, acceso al mar, etc.) y línea de tiempo de políticas de estancia.
 
-6. **💳 Motor de Reservas & Widget Dinámico:**
+7. **💳 Motor de Reservas & Widget Dinámico:**
    - Widget flotante con recálculo dinámico de tarifa base según noches seleccionadas, tasa de limpieza y comisión de servicio.
    - **Prevención de Doble Reserva (Double Booking Collision):** Detección inmediata si las fechas seleccionadas ya han sido reservadas por otro huésped.
    - Modal de confirmación con generación de voucher estilo tarjeta de embarque (*Boarding Pass*) con código único de reserva (`STAY-AMALFI-XXXX`).
 
-7. **🧳 Panel "Mis Viajes" (Guest Portal):**
+8. **🧳 Panel "Mis Viajes" (Guest Portal):**
    - Gestión de reservas con filtros por estado (*All, Confirmed, Cancelled*), visualización de fechas, número de huéspedes e importe total.
    - Flujo de cancelación con reembolso completo simulado y confirmación modal.
 
-8. **📊 Portal del Anfitrião (Host Performance Hub):**
+9. **📊 Portal del Anfitrión (Host Performance Hub):**
    - **4 Tarjetas KPI:** Ingresos Mensuales (€18.450, +14.2%), Tasa de Ocupación (88%), Reservas Activas (12 huéspedes) y Puntuación Superhost (4.96 ★).
    - **Gráfico de Área con Recharts:** Trayectoria semestral de facturación con gradiente temático y tooltip enriquecido.
    - **Matriz de Disponibilidad:** Calendario interactivo mensual que refleja estancias confirmadas y permite bloquear/desbloquear fechas con un solo clic.
@@ -71,7 +81,8 @@
 15-booking-platform/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                     # Pipeline CI (Lint, Test, Build)
+│       ├── ci.yml                     # Pipeline CI (Lint, Test, Build)
+│       └── deploy.yml                 # Despliegue continuo automático a GitHub Pages
 ├── database/
 │   ├── schema.sql                     # DDL relacional PostgreSQL 17
 │   ├── seed.sql                       # Datos determinísticos de demostración
@@ -93,6 +104,8 @@
 │   │   ├── layout/
 │   │   │   ├── AppShell.tsx
 │   │   │   ├── Footer.tsx
+│   │   │   ├── MobileBottomNav.tsx
+│   │   │   ├── MobileSearchModal.tsx
 │   │   │   └── Navbar.tsx
 │   │   ├── marketplace/
 │   │   │   ├── CategoryFilterBar.tsx
@@ -107,8 +120,10 @@
 │   │   │   ├── PropertyDetailView.tsx
 │   │   │   ├── PropertyGalleryModal.tsx
 │   │   │   └── PropertyHeader.tsx
-│   │   └── trips/
-│   │       └── MyTripsView.tsx
+│   │   ├── trips/
+│   │   │   └── MyTripsView.tsx
+│   │   └── ui/
+│   │       └── DateRangePickerPopover.tsx
 │   ├── data/
 │   │   └── mockData.ts                # Inmuebles, anfitriones y reservas
 │   ├── stores/
@@ -118,6 +133,8 @@
 │   ├── types/
 │   │   └── stayhub.ts                 # Definiciones de tipos TypeScript
 │   ├── utils/
+│   │   ├── dateFormatters.ts          # Formateador de rangos de fechas
+│   │   ├── dateFormatters.test.ts
 │   │   ├── pricing.ts                 # Cálculo de importes y comisiones
 │   │   ├── pricing.test.ts
 │   │   └── accessibility.test.ts
@@ -262,7 +279,7 @@ erDiagram
 
 ## 🛡️ Calidad de Código & Testing
 
-- **21 Pruebas Unitarias e Integración (Vitest):** Cobertura exhaustiva de cálculo de precios y comisiones, prevención de colisiones de reserva (*double booking*), conmutación de roles RBAC, filtrado facetado y pruebas de accesibilidad.
+- **25 Pruebas Unitarias e Integración (Vitest):** Cobertura exhaustiva de cálculo de precios y comisiones, formateo de fechas de doble mes, prevención de colisiones de reserva (*double booking*), conmutación de roles RBAC, filtrado facetado y pruebas de accesibilidad.
 - **Oxlint:** Cero advertencias y cero errores en la totalidad del código fuente.
 - **Accesibilidad (a11y):** Semántica ARIA completa (`role="dialog"`, `aria-modal="true"`), soporte de teclado y anillos de foco visibles (`focus-visible:ring-2`).
 
