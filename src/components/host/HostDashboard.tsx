@@ -1,6 +1,7 @@
 import { Plus, Sparkles } from 'lucide-react';
 import { HostKpiCards } from './HostKpiCards.tsx';
 import { RevenueChart } from './RevenueChart.tsx';
+import { AvailabilityCalendar } from './AvailabilityCalendar.tsx';
 import { useAuthStore } from '../../stores/useAuthStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 
@@ -46,7 +47,10 @@ export function HostDashboard() {
       {/* Revenue Trajectory Chart */}
       <RevenueChart />
 
-      {/* Active Listings Grid / Table */}
+      {/* Interactive Availability Calendar */}
+      <AvailabilityCalendar />
+
+      {/* Active Listings Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
