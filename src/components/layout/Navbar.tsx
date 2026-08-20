@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, User as UserIcon, Shield, Home, Briefcase, CalendarCheck } from 'lucide-react';
+import { Search, User as UserIcon, Shield, Home, Briefcase, CalendarCheck, SlidersHorizontal } from 'lucide-react';
 import { useAuthStore } from '../../stores/useAuthStore.ts';
 import { useFilterStore } from '../../stores/useFilterStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
@@ -355,33 +355,34 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Search Bar Pill (Always visible on mobile < md) */}
-        <div className="md:hidden pb-4">
+        {/* Elevated Luxury Mobile Search Pill (Airbnb App Style) */}
+        <div className="md:hidden pb-4 pt-1">
           <button
             onClick={() => setIsMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 rounded-full p-2.5 px-4 shadow-lg shadow-black/40 text-left cursor-pointer"
+            className="w-full flex items-center justify-between bg-[#121929] border border-slate-700/90 hover:border-slate-600 rounded-full p-2 pl-3 pr-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-left cursor-pointer group active:scale-[0.99] transition-all"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-400 flex items-center justify-center">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-md shadow-rose-500/30 flex-shrink-0 group-hover:scale-105 transition-transform">
                 <Search className="w-4 h-4" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-white">
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-white truncate">
                   {destination || 'Where to?'}
                 </div>
-                <div className="text-[10px] text-slate-400 font-medium">
-                  {formattedDates !== 'Add dates' ? formattedDates : 'Anytime'} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                <div className="text-[11px] text-slate-400 font-medium truncate">
+                  {formattedDates !== 'Add dates' ? formattedDates : 'Anywhere'} · {guests} {guests === 1 ? 'guest' : 'guests'}
                 </div>
               </div>
             </div>
-            <div className="p-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-bold px-2.5">
-              Filters
+
+            <div className="w-8 h-8 rounded-full border border-slate-700/80 bg-[#070B14] flex items-center justify-center text-slate-300 flex-shrink-0">
+              <SlidersHorizontal className="w-3.5 h-3.5" />
             </div>
           </button>
         </div>
       </div>
 
-      {/* Full-Screen Mobile Search Drawer */}
+      {/* Full-Screen Mobile Search Modal (Rendered via React Portal) */}
       <MobileSearchModal
         isOpen={isMobileSearchOpen}
         onClose={() => setIsMobileSearchOpen(false)}
