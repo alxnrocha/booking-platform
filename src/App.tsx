@@ -3,6 +3,7 @@ import { CategoryFilterBar } from './components/marketplace/CategoryFilterBar.ts
 import { PropertyGrid } from './components/marketplace/PropertyGrid.tsx';
 import { PropertyDetailView } from './components/property/PropertyDetailView.tsx';
 import { MyTripsView } from './components/trips/MyTripsView.tsx';
+import { HostDashboard } from './components/host/HostDashboard.tsx';
 import { useBookingStore } from './stores/useBookingStore.ts';
 
 export default function App() {
@@ -21,14 +22,7 @@ export default function App() {
 
       {currentView === 'my-trips' && <MyTripsView />}
 
-      {currentView === 'host-portal' && (
-        <div className="bg-[#151E32] border border-slate-800 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Host Management Portal</h2>
-          <p className="text-slate-400 text-sm">
-            Milestone 3 feature — Under active development.
-          </p>
-        </div>
-      )}
+      {currentView === 'host-portal' && <HostDashboard />}
     </AppShell>
   );
 }
