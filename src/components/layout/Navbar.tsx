@@ -6,6 +6,7 @@ import { useBookingStore } from '../../stores/useBookingStore.ts';
 import { UserRole } from '../../types/stayhub.ts';
 import { DateRangePickerPopover } from '../ui/DateRangePickerPopover.tsx';
 import { formatDateRange } from '../../utils/dateFormatters.ts';
+import { MobileSearchModal } from './MobileSearchModal.tsx';
 
 export function Navbar() {
   const { currentUser, setRole } = useAuthStore();
@@ -16,6 +17,7 @@ export function Navbar() {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isGuestPopoverOpen, setIsGuestPopoverOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -63,6 +65,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-[#0A0F1D]/95 backdrop-blur-xl border-b border-slate-800/80 transition-all">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12">
+        {/* Desktop and Tablet Topbar */}
         <div className="flex items-center justify-between h-20 gap-4">
           {/* Brand Logo */}
           <button
@@ -81,7 +84,7 @@ export function Navbar() {
             </span>
           </button>
 
-          {/* Floating Pill Search Bar (Expanded & Wider with Formatted Dates) */}
+          {/* Floating Pill Search Bar (Desktop / Tablet) */}
           <div ref={searchRef} className="hidden md:flex items-center justify-center flex-1 max-w-3xl px-2 relative">
             <div className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 hover:border-slate-600 rounded-full shadow-xl shadow-black/40 p-2 pl-6 text-xs text-slate-300 transition-all">
               {/* Destination Section */}
@@ -101,7 +104,7 @@ export function Navbar() {
 
               <div className="w-px h-7 bg-slate-700 mx-1" />
 
-              {/* Dates Section (Clean & Formatted Dates without narrow truncation) */}
+              {/* Dates Section */}
               <button
                 onClick={() => {
                   setIsDatePickerOpen(!isDatePickerOpen);
@@ -229,10 +232,10 @@ export function Navbar() {
 
           {/* Right Navigation & RBAC User Menu */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            {/* My Trips */}
+            {/* My Trips (Desktop) */}
             <button
               onClick={() => setCurrentView('my-trips')}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`hidden md:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                 currentView === 'my-trips'
                   ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -242,10 +245,10 @@ export function Navbar() {
               <span>My Trips</span>
             </button>
 
-            {/* Host Portal Toggle */}
+            {/* Host Portal Toggle (Desktop) */}
             <button
               onClick={() => setCurrentView(currentView === 'host-portal' ? 'marketplace' : 'host-portal')}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`hidden md:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                 currentView === 'host-portal'
                   ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700/60'
@@ -351,7 +354,38 @@ export function Navbar() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Search Bar Pill (Always visible on mobile < md) */}
+        <div className="md:hidden pb-4">
+          <button
+            onClick={() => setIsMobileSearchOpen(true)}
+            className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 rounded-full p-2.5 px-4 shadow-lg shadow-black/40 text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-400 flex items-center justify-center">
+                <Search className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-white">
+                  {destination || 'Where to?'}
+                </div>
+                <div className="text-[10px] text-slate-400 font-medium">
+                  {formattedDates !== 'Add dates' ? formattedDates : 'Anytime'} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                </div>
+              </div>
+            </div>
+            <div className="p-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-bold px-2.5">
+              Filters
+            </div>
+          </button>
+        </div>
       </div>
+
+      {/* Full-Screen Mobile Search Drawer */}
+      <MobileSearchModal
+        isOpen={isMobileSearchOpen}
+        onClose={() => setIsMobileSearchOpen(false)}
+      />
     </header>
   );
 }
