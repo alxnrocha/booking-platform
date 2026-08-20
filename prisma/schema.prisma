@@ -1,0 +1,111 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  GUEST
+  HOST
+  ADMIN
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  avatarUrl    String
+  role         Role          @default(GUEST)
+  isSuperhost  Boolean       @default(false)
+  yearsHosting Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  properties   Property[]
+  reservations Reservation[]
+  reviews      Review[]
+
+  @@map("users")
+}
+
+model Property {
+  id               String        @id @default(cuid())
+  hostId           String
+  host             User          @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  title            String
+  subtitle         String
+  description      String
+  location         String
+  country          String
+  category         String
+  pricePerNight    Decimal       @db.Decimal(10, 2)
+  cleaningFee      Decimal       @db.Decimal(10, 2)
+  serviceFeeRate   Decimal       @db.Decimal(5, 4) @default(0.1145)
+  rating           Decimal       @db.Decimal(3, 2) @default(5.0)
+  reviewCount      Int           @default(0)
+  isSuperhost      Boolean       @default(false)
+  maxGuests        Int           @default(4)
+  bedrooms         Int           @default(2)
+  beds             Int           @default(3)
+  baths            Int           @default(2)
+  images           String[]
+  amenities        String[]
+  sleepingDetails  Json
+  cancellationDays Int           @default(30)
+  instantBooking   Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  reservations     Reservation[]
+  reviews          Review[]
+
+  @@index([category])
+  @@index([location])
+  @@map("properties")
+}
+
+model Reservation {
+  id               String            @id @default(cuid())
+  propertyId       String
+  property         Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  guestId          String
+  guest            User              @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  checkIn          DateTime
+  checkOut         DateTime
+  nights           Int
+  guestsCount      Int
+  basePrice        Decimal           @db.Decimal(10, 2)
+  cleaningFee      Decimal           @db.Decimal(10, 2)
+  serviceFee       Decimal           @db.Decimal(10, 2)
+  totalPrice       Decimal           @db.Decimal(10, 2)
+  status           ReservationStatus @default(CONFIRMED)
+  confirmationCode String            @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([propertyId, checkIn, checkOut])
+  @@index([guestId])
+  @@map("reservations")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+
+  @@index([propertyId])
+  @@map("reviews")
+}
