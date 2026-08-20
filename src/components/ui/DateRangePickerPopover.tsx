@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, RotateCcw, Check } from 'lucide-react';
 import { formatDateRange } from '../../utils/dateFormatters.ts';
 
@@ -8,6 +8,11 @@ interface DateRangePickerPopoverProps {
   onSelectDates: (checkIn: string | null, checkOut: string | null) => void;
   onClose: () => void;
 }
+
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 export function DateRangePickerPopover({
   checkIn,
@@ -26,21 +31,9 @@ export function DateRangePickerPopover({
   const [tempCheckIn, setTempCheckIn] = useState<string | null>(checkIn || '2026-06-10');
   const [tempCheckOut, setTempCheckOut] = useState<string | null>(checkOut || '2026-06-13');
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  // Number of days in the currently viewed month
-  const daysInMonth = useMemo(() => {
-    return new Date(currentYear, currentMonthIndex + 1, 0).getDate();
-  }, [currentYear, currentMonthIndex]);
-
-  // First day of month (0 = Sunday, 1 = Monday, etc.) -> Convert to Monday-start (0 = Mon, 6 = Sun)
-  const startDayOffset = useMemo(() => {
-    const day = new Date(currentYear, currentMonthIndex, 1).getDay();
-    return (day + 6) % 7;
-  }, [currentYear, currentMonthIndex]);
+  // Next Month calculation for side-by-side view
+  const nextMonthYear = currentMonthIndex === 11 ? currentYear + 1 : currentYear;
+  const nextMonthIndex = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1;
 
   const handlePrevMonth = () => {
     if (currentMonthIndex === 0) {
@@ -60,14 +53,10 @@ export function DateRangePickerPopover({
     }
   };
 
-  const buildDateString = (day: number) => {
-    const m = (currentMonthIndex + 1).toString().padStart(2, '0');
+  const handleDayClick = (year: number, monthIndex: number, day: number) => {
+    const m = (monthIndex + 1).toString().padStart(2, '0');
     const d = day.toString().padStart(2, '0');
-    return `${currentYear}-${m}-${d}`;
-  };
-
-  const handleDayClick = (day: number) => {
-    const dateStr = buildDateString(day);
+    const dateStr = `${year}-${m}-${d}`;
     const clickedTime = new Date(dateStr).getTime();
 
     if (!tempCheckIn || (tempCheckIn && tempCheckOut)) {
@@ -77,7 +66,7 @@ export function DateRangePickerPopover({
     } else if (tempCheckIn && !tempCheckOut) {
       const inTime = new Date(tempCheckIn).getTime();
       if (clickedTime < inTime) {
-        // If clicked date is before checkIn, make it new checkIn
+        // If clicked date is before checkIn, make it the new checkIn
         setTempCheckIn(dateStr);
       } else if (clickedTime === inTime) {
         // Same date: 1-night stay next day
@@ -92,8 +81,10 @@ export function DateRangePickerPopover({
     }
   };
 
-  const getDayState = (day: number) => {
-    const dateStr = buildDateString(day);
+  const getDayState = (year: number, monthIndex: number, day: number) => {
+    const m = (monthIndex + 1).toString().padStart(2, '0');
+    const d = day.toString().padStart(2, '0');
+    const dateStr = `${year}-${m}-${d}`;
     const time = new Date(dateStr).getTime();
 
     const isStart = tempCheckIn === dateStr;
@@ -110,7 +101,7 @@ export function DateRangePickerPopover({
       isInRange = time > inTime && time <= hTime;
     }
 
-    return { isStart, isEnd, isInRange };
+    return { isStart, isEnd, isInRange, dateStr };
   };
 
   const calculateNights = () => {
@@ -141,9 +132,64 @@ export function DateRangePickerPopover({
     setCurrentMonthIndex(monthOffset);
   };
 
+  // Helper to render a single month calendar block
+  const renderMonthBlock = (year: number, monthIndex: number) => {
+    const daysCount = new Date(year, monthIndex + 1, 0).getDate();
+    const dayOfWeek = new Date(year, monthIndex, 1).getDay();
+    const offset = (dayOfWeek + 6) % 7; // Monday-start
+
+    return (
+      <div className="space-y-3">
+        <div className="text-center font-bold text-sm text-white py-1">
+          {monthNames[monthIndex]} {year}
+        </div>
+
+        {/* Weekday headers */}
+        <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400">
+          {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => (
+            <div key={d} className="py-1">
+              {d}
+            </div>
+          ))}
+        </div>
+
+        {/* Days grid */}
+        <div className="grid grid-cols-7 gap-y-1 gap-x-0.5">
+          {Array.from({ length: offset }).map((_, idx) => (
+            <div key={`offset-${year}-${monthIndex}-${idx}`} className="h-9 w-full" />
+          ))}
+
+          {Array.from({ length: daysCount }).map((_, idx) => {
+            const day = idx + 1;
+            const { isStart, isEnd, isInRange, dateStr } = getDayState(year, monthIndex, day);
+
+            return (
+              <button
+                key={`day-${year}-${monthIndex}-${day}`}
+                onClick={() => handleDayClick(year, monthIndex, day)}
+                onMouseEnter={() => setHoverDate(dateStr)}
+                className={`h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer ${
+                  isStart
+                    ? 'bg-rose-500 text-white font-extrabold rounded-l-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
+                    : isEnd
+                    ? 'bg-rose-500 text-white font-extrabold rounded-r-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
+                    : isInRange
+                    ? 'bg-rose-500/20 text-rose-200'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white rounded-full'
+                }`}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-5 text-white max-w-md w-full animate-in zoom-in-95">
-      {/* Header */}
+    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-6 text-white max-w-2xl lg:max-w-3xl w-full animate-in zoom-in-95">
+      {/* Header & Quick Presets */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-xl bg-rose-500/15 text-rose-400">
@@ -192,77 +238,45 @@ export function DateRangePickerPopover({
         </button>
       </div>
 
-      {/* Month Navigation */}
-      <div className="flex items-center justify-between px-1">
+      {/* Navigation Controls Bar */}
+      <div className="flex items-center justify-between px-2 pt-1">
         <button
           onClick={handlePrevMonth}
-          className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer text-xs font-semibold"
           aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4" />
+          <span>Previous</span>
         </button>
 
-        <span className="text-sm font-bold text-white tracking-wide">
-          {monthNames[currentMonthIndex]} {currentYear}
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">
+          Dual-Month Planner
         </span>
 
         <button
           onClick={handleNextMonth}
-          className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer text-xs font-semibold"
           aria-label="Next month"
         >
+          <span>Next</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400">
-        {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
-          <div key={day} className="py-1">
-            {day}
-          </div>
-        ))}
-      </div>
+      {/* Dual Month Grids Side by Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+        {/* Left Month */}
+        <div>{renderMonthBlock(currentYear, currentMonthIndex)}</div>
 
-      {/* Days Grid with dynamic starting offset and days count */}
-      <div className="grid grid-cols-7 gap-y-1 gap-x-0.5">
-        {/* Empty padding cells for first week alignment */}
-        {Array.from({ length: startDayOffset }).map((_, idx) => (
-          <div key={`offset-${idx}`} className="h-9 w-full" />
-        ))}
-
-        {/* Days of current month */}
-        {Array.from({ length: daysInMonth }).map((_, idx) => {
-          const day = idx + 1;
-          const { isStart, isEnd, isInRange } = getDayState(day);
-          const dateStr = buildDateString(day);
-
-          return (
-            <button
-              key={`day-${day}`}
-              onClick={() => handleDayClick(day)}
-              onMouseEnter={() => setHoverDate(dateStr)}
-              className={`h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer ${
-                isStart
-                  ? 'bg-rose-500 text-white font-extrabold rounded-l-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
-                  : isEnd
-                  ? 'bg-rose-500 text-white font-extrabold rounded-r-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
-                  : isInRange
-                  ? 'bg-rose-500/20 text-rose-200'
-                  : 'hover:bg-slate-800 text-slate-300 hover:text-white rounded-full'
-              }`}
-            >
-              {day}
-            </button>
-          );
-        })}
+        {/* Right Month */}
+        <div>{renderMonthBlock(nextMonthYear, nextMonthIndex)}</div>
       </div>
 
       {/* Footer Details & Apply Button */}
       <div className="flex items-center justify-between pt-4 border-t border-slate-800">
         <div className="text-xs">
           <span className="text-slate-400 block text-[10px] uppercase font-bold">Selected Dates</span>
-          <span className="font-bold text-rose-400">
+          <span className="font-bold text-rose-400 text-sm">
             {tempCheckIn && tempCheckOut
               ? formatDateRange(tempCheckIn, tempCheckOut)
               : tempCheckIn
@@ -274,7 +288,7 @@ export function DateRangePickerPopover({
         <button
           onClick={handleApply}
           disabled={!tempCheckIn}
-          className="flex items-center gap-1.5 px-5 py-2.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-500/30 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-6 py-2.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-500/30 transition-all cursor-pointer"
         >
           <Check className="w-3.5 h-3.5" />
           <span>Apply Dates</span>
