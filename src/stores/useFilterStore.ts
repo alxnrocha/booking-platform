@@ -26,7 +26,7 @@ const initialFilters = {
   checkIn: null,
   checkOut: null,
   guests: 1,
-  category: 'Beachfront' as PropertyCategory | 'All',
+  category: 'All' as PropertyCategory | 'All',
   minPrice: 0,
   maxPrice: 1500,
   superhostOnly: false,

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
+  Sparkles,
   Umbrella,
   Home,
-  Sparkles,
+  Crown,
   Waves,
   Box,
   Trees,
@@ -24,9 +25,10 @@ interface CategoryItem {
 }
 
 const categories: CategoryItem[] = [
+  { name: 'All', label: 'All Stays', icon: Sparkles },
   { name: 'Beachfront', label: 'Beachfront', icon: Umbrella },
   { name: 'Modern Cabins', label: 'Modern Cabins', icon: Home },
-  { name: 'Luxury Villas', label: 'Luxury Villas', icon: Sparkles },
+  { name: 'Luxury Villas', label: 'Luxury Villas', icon: Crown },
   { name: 'Infinity Pools', label: 'Infinity Pools', icon: Waves },
   { name: 'Tiny Homes', label: 'Tiny Homes', icon: Box },
   { name: 'Treehouses', label: 'Treehouses', icon: Trees },
@@ -45,7 +47,8 @@ export function CategoryFilterBar() {
     (minPrice > 0 || maxPrice < 1500 ? 1 : 0) +
     (superhostOnly ? 1 : 0) +
     (instantBookingOnly ? 1 : 0) +
-    (destination ? 1 : 0);
+    (destination ? 1 : 0) +
+    (category !== 'All' ? 1 : 0);
 
   return (
     <div className="py-4 border-b border-slate-800/80 mb-8">

@@ -6,10 +6,10 @@ describe('useFilterStore', () => {
     useFilterStore.getState().resetFilters();
   });
 
-  it('initializes with default state values', () => {
+  it('initializes with default state values and category All', () => {
     const state = useFilterStore.getState();
     expect(state.destination).toBe('');
-    expect(state.category).toBe('Beachfront');
+    expect(state.category).toBe('All');
     expect(state.guests).toBe(1);
     expect(state.minPrice).toBe(0);
     expect(state.maxPrice).toBe(1500);
@@ -47,7 +47,7 @@ describe('useFilterStore', () => {
     const state = useFilterStore.getState();
     expect(state.destination).toBe('');
     expect(state.guests).toBe(1);
-    expect(state.category).toBe('Beachfront');
+    expect(state.category).toBe('All');
     expect(state.superhostOnly).toBe(false);
   });
 });
