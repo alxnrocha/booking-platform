@@ -5,6 +5,7 @@ import { useFilterStore } from '../../stores/useFilterStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 import { UserRole } from '../../types/stayhub.ts';
 import { DateRangePickerPopover } from '../ui/DateRangePickerPopover.tsx';
+import { formatDateRange } from '../../utils/dateFormatters.ts';
 
 export function Navbar() {
   const { currentUser, setRole } = useAuthStore();
@@ -57,6 +58,8 @@ export function Navbar() {
     }
   };
 
+  const formattedDates = formatDateRange(checkIn, checkOut);
+
   return (
     <header className="sticky top-0 z-40 bg-[#0A0F1D]/95 backdrop-blur-xl border-b border-slate-800/80 transition-all">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12">
@@ -78,8 +81,8 @@ export function Navbar() {
             </span>
           </button>
 
-          {/* Floating Pill Search Bar (Expanded & Wider) */}
-          <div ref={searchRef} className="hidden md:flex items-center justify-center flex-1 max-w-2xl px-2 relative">
+          {/* Floating Pill Search Bar (Expanded & Wider with Formatted Dates) */}
+          <div ref={searchRef} className="hidden md:flex items-center justify-center flex-1 max-w-3xl px-2 relative">
             <div className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 hover:border-slate-600 rounded-full shadow-xl shadow-black/40 p-2 pl-6 text-xs text-slate-300 transition-all">
               {/* Destination Section */}
               <button
@@ -88,28 +91,28 @@ export function Navbar() {
                   setIsDatePickerOpen(false);
                   setIsGuestPopoverOpen(false);
                 }}
-                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
+                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[140px]"
               >
                 <div className="font-bold text-white text-xs">Destination</div>
-                <div className="text-slate-400 truncate max-w-[160px] text-[11px]">
+                <div className="text-slate-400 truncate max-w-[180px] text-[11px]">
                   {destination || 'Where are you going?'}
                 </div>
               </button>
 
               <div className="w-px h-7 bg-slate-700 mx-1" />
 
-              {/* Dates Section (Opens Custom Calendar Popover) */}
+              {/* Dates Section (Clean & Formatted Dates without narrow truncation) */}
               <button
                 onClick={() => {
                   setIsDatePickerOpen(!isDatePickerOpen);
                   setIsSearchOpen(false);
                   setIsGuestPopoverOpen(false);
                 }}
-                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
+                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[170px]"
               >
                 <div className="font-bold text-white text-xs">Check in – Check out</div>
-                <div className="text-rose-400 font-medium truncate max-w-[150px] text-[11px]">
-                  {checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'Add dates'}
+                <div className={`text-[11px] font-semibold ${checkIn ? 'text-rose-400 font-bold' : 'text-slate-400'}`}>
+                  {formattedDates}
                 </div>
               </button>
 
@@ -122,7 +125,7 @@ export function Navbar() {
                   setIsSearchOpen(false);
                   setIsDatePickerOpen(false);
                 }}
-                className="px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
+                className="px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[90px]"
               >
                 <div className="font-bold text-white text-xs">Guests</div>
                 <div className="text-slate-400 text-[11px]">
