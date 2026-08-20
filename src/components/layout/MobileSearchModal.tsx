@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Search,
   ChevronLeft,
   ChevronRight,
+  MapPin,
+  Calendar,
+  Users,
 } from 'lucide-react';
 import { useFilterStore } from '../../stores/useFilterStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
@@ -27,7 +31,7 @@ const popularRegions: RegionItem[] = [
   {
     id: 'anywhere',
     name: "I'm flexible",
-    country: 'Explore worldwide',
+    country: 'Explore world',
     image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80',
   },
   {
@@ -88,6 +92,18 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
   const [hoverDate, setHoverDate] = useState<string | null>(null);
   const [tempCheckIn, setTempCheckIn] = useState<string | null>(checkIn);
   const [tempCheckOut, setTempCheckOut] = useState<string | null>(checkOut);
+
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -193,45 +209,49 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 bg-[#080C17] flex flex-col md:hidden animate-in slide-in-from-bottom duration-300"
+      className="fixed inset-0 w-full h-[100dvh] z-[99999] bg-[#070B14] text-white flex flex-col justify-between overflow-hidden animate-in fade-in zoom-in-95 duration-200"
       role="dialog"
       aria-modal="true"
     >
-      {/* Top Header with Tabs */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80 bg-[#0A0F1D]">
+      {/* 1. TOP HEADER */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#070B14] flex-shrink-0">
         <button
           onClick={onClose}
-          className="w-8 h-8 rounded-full bg-slate-800/80 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer shadow-md"
-          aria-label="Close search"
+          className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer shadow-lg"
+          aria-label="Close search modal"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
 
+        {/* Tab pills */}
         <div className="flex items-center gap-6">
-          <button className="text-sm font-bold text-white border-b-2 border-rose-500 pb-1">
+          <button className="text-sm font-bold text-white border-b-2 border-rose-500 pb-1 cursor-pointer">
             Stays
           </button>
-          <button className="text-sm font-medium text-slate-400 hover:text-slate-200 pb-1">
+          <button className="text-sm font-semibold text-slate-400 hover:text-slate-200 pb-1 cursor-pointer">
             Experiences
           </button>
         </div>
 
-        <div className="w-8" />
+        <div className="w-9" />
       </div>
 
-      {/* Main Scrollable Content with 3 Collapsible Accordion Cards */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-none pb-28">
+      {/* 2. SCROLLABLE ACCORDION BODY */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3.5 scrollbar-none pb-28">
         {/* CARD 1: WHERE TO? */}
-        <div className="bg-[#151E32] border border-slate-700/80 rounded-3xl overflow-hidden shadow-xl transition-all">
+        <div className="bg-[#121929] border border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl transition-all">
           {activeSection !== 'where' ? (
             /* Collapsed View */
             <button
               onClick={() => setActiveSection('where')}
-              className="w-full p-5 flex items-center justify-between text-left cursor-pointer"
+              className="w-full p-4 px-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-800/30 transition-colors"
             >
-              <span className="text-xs font-semibold text-slate-400">Where</span>
+              <div className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-semibold text-slate-400">Where</span>
+              </div>
               <span className="text-xs font-bold text-white truncate max-w-[180px]">
                 {destination || "I'm flexible"}
               </span>
@@ -239,7 +259,12 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
           ) : (
             /* Expanded View */
             <div className="p-5 space-y-4 animate-in fade-in duration-200">
-              <h3 className="text-xl font-black text-white tracking-tight">Where to?</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-extrabold text-white tracking-tight">Where to?</h3>
+                <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded uppercase">
+                  Step 1
+                </span>
+              </div>
 
               <div className="relative">
                 <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
@@ -248,13 +273,13 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   placeholder="Search destinations (e.g. Amalfi, Bali)"
-                  className="w-full bg-[#0A0F1D] border border-slate-700 rounded-2xl pl-12 pr-10 py-3 text-sm text-white focus:outline-none focus:border-rose-500"
+                  className="w-full bg-[#070B14] border border-slate-700 rounded-2xl pl-12 pr-10 py-3 text-sm text-white focus:outline-none focus:border-rose-500"
                   autoFocus
                 />
                 {destination && (
                   <button
                     onClick={() => setDestination('')}
-                    className="absolute right-3.5 top-3.5 p-1 rounded-full text-slate-400 hover:text-white"
+                    className="absolute right-3.5 top-3.5 p-1 rounded-full text-slate-400 hover:text-white cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -271,7 +296,7 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
                     <button
                       key={region.id}
                       onClick={() => handleSelectRegion(region)}
-                      className="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#0A0F1D] border border-slate-800 hover:border-rose-500/60 hover:scale-[1.02] transition-all text-center cursor-pointer group"
+                      className="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-[#070B14] border border-slate-800 hover:border-rose-500/60 hover:scale-[1.02] transition-all text-center cursor-pointer group"
                     >
                       <img
                         src={region.image}
@@ -290,14 +315,17 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
         </div>
 
         {/* CARD 2: WHEN'S YOUR TRIP? */}
-        <div className="bg-[#151E32] border border-slate-700/80 rounded-3xl overflow-hidden shadow-xl transition-all">
+        <div className="bg-[#121929] border border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl transition-all">
           {activeSection !== 'when' ? (
             /* Collapsed View */
             <button
               onClick={() => setActiveSection('when')}
-              className="w-full p-5 flex items-center justify-between text-left cursor-pointer"
+              className="w-full p-4 px-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-800/30 transition-colors"
             >
-              <span className="text-xs font-semibold text-slate-400">When</span>
+              <div className="flex items-center gap-2.5">
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-semibold text-slate-400">When</span>
+              </div>
               <span className="text-xs font-bold text-white">
                 {tempCheckIn ? formatDateRange(tempCheckIn, tempCheckOut) : 'Add dates'}
               </span>
@@ -306,14 +334,23 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
             /* Expanded View */
             <div className="p-5 space-y-4 animate-in fade-in duration-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-black text-white tracking-tight">When's your trip?</h3>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white tracking-tight">When's your trip?</h3>
+                  <p className="text-xs text-slate-400">
+                    {tempCheckIn && tempCheckOut
+                      ? formatDateRange(tempCheckIn, tempCheckOut)
+                      : tempCheckIn
+                      ? 'Select checkout date'
+                      : 'Choose check-in date'}
+                  </p>
+                </div>
                 {tempCheckIn && (
                   <button
                     onClick={() => {
                       setTempCheckIn(null);
                       setTempCheckOut(null);
                     }}
-                    className="text-xs text-rose-400 font-semibold"
+                    className="text-xs text-rose-400 font-semibold cursor-pointer"
                   >
                     Reset
                   </button>
@@ -321,7 +358,7 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
               </div>
 
               {/* Month Navigation */}
-              <div className="flex items-center justify-between px-1 bg-[#0A0F1D] border border-slate-700/80 rounded-2xl p-2">
+              <div className="flex items-center justify-between px-1 bg-[#070B14] border border-slate-700/80 rounded-2xl p-2">
                 <button
                   onClick={handlePrevMonth}
                   className="p-1.5 rounded-xl text-slate-300 hover:text-white cursor-pointer"
@@ -396,14 +433,17 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
         </div>
 
         {/* CARD 3: WHO'S COMING? */}
-        <div className="bg-[#151E32] border border-slate-700/80 rounded-3xl overflow-hidden shadow-xl transition-all">
+        <div className="bg-[#121929] border border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl transition-all">
           {activeSection !== 'who' ? (
             /* Collapsed View */
             <button
               onClick={() => setActiveSection('who')}
-              className="w-full p-5 flex items-center justify-between text-left cursor-pointer"
+              className="w-full p-4 px-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-800/30 transition-colors"
             >
-              <span className="text-xs font-semibold text-slate-400">Who</span>
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-semibold text-slate-400">Who</span>
+              </div>
               <span className="text-xs font-bold text-white">
                 {adults + children} {adults + children === 1 ? 'guest' : 'guests'}
                 {infants > 0 ? `, ${infants} infant` : ''}
@@ -412,7 +452,7 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
           ) : (
             /* Expanded View with Steppers */
             <div className="p-5 space-y-4 animate-in fade-in duration-200">
-              <h3 className="text-xl font-black text-white tracking-tight">Who's coming?</h3>
+              <h3 className="text-xl font-extrabold text-white tracking-tight">Who's coming?</h3>
 
               {/* 1. Adults */}
               <div className="flex items-center justify-between py-2 border-b border-slate-800">
@@ -514,23 +554,24 @@ export function MobileSearchModal({ isOpen, onClose }: MobileSearchModalProps) {
         </div>
       </div>
 
-      {/* Floating Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-slate-800/80 bg-[#0A0F1D]/95 backdrop-blur-xl flex items-center justify-between gap-4 z-50">
+      {/* 3. SOLID BOTTOM STICKY ACTION BAR */}
+      <div className="flex-shrink-0 p-4 px-6 border-t border-slate-800 bg-[#070B14] flex items-center justify-between gap-4 shadow-2xl">
         <button
           onClick={handleClearAll}
-          className="text-xs font-bold text-slate-300 hover:text-white underline cursor-pointer px-2"
+          className="text-xs font-bold text-slate-300 hover:text-white underline cursor-pointer py-2 px-1"
         >
           Clear all
         </button>
 
         <button
           onClick={handleFinalSearch}
-          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg shadow-rose-500/30 cursor-pointer"
+          className="flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg shadow-rose-500/30 active:scale-[0.98] transition-all cursor-pointer"
         >
           <Search className="w-4 h-4" />
           <span>Search Stays</span>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
