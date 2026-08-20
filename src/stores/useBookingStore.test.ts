@@ -76,4 +76,30 @@ describe('useBookingStore', () => {
     const cancelledRes = useBookingStore.getState().reservations.find((r) => r.id === resId);
     expect(cancelledRes?.status).toBe('CANCELLED');
   });
+
+  it('toggles property favorite state', () => {
+    const store = useBookingStore.getState();
+    const initialFav = store.properties.find((p) => p.id === 'prop_amalfi_villa')?.isFavorite;
+    
+    store.toggleFavorite('prop_amalfi_villa');
+    const updatedFav = useBookingStore.getState().properties.find((p) => p.id === 'prop_amalfi_villa')?.isFavorite;
+    expect(updatedFav).toBe(!initialFav);
+  });
+
+  it('toggles instant booking flag for a property', () => {
+    const store = useBookingStore.getState();
+    const initialInstant = store.properties.find((p) => p.id === 'prop_amalfi_villa')?.instantBooking;
+    
+    store.toggleInstantBooking('prop_amalfi_villa');
+    const updatedInstant = useBookingStore.getState().properties.find((p) => p.id === 'prop_amalfi_villa')?.instantBooking;
+    expect(updatedInstant).toBe(!initialInstant);
+  });
+
+  it('updates property details partially', () => {
+    const store = useBookingStore.getState();
+    store.updateProperty('prop_amalfi_villa', { pricePerNight: 395 });
+    
+    const updatedProp = useBookingStore.getState().properties.find((p) => p.id === 'prop_amalfi_villa');
+    expect(updatedProp?.pricePerNight).toBe(395);
+  });
 });
