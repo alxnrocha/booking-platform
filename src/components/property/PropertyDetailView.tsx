@@ -5,6 +5,7 @@ import { BedroomCards } from './BedroomCards.tsx';
 import { AmenitiesGrid } from './AmenitiesGrid.tsx';
 import { BookingPolicyTimeline } from './BookingPolicyTimeline.tsx';
 import { BookingWidget } from '../booking/BookingWidget.tsx';
+import { BookingConfirmationModal } from '../booking/BookingConfirmationModal.tsx';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 
 export function PropertyDetailView() {
@@ -12,7 +13,7 @@ export function PropertyDetailView() {
 
   const property = properties.find((p) => p.id === selectedPropertyId) || properties[0];
 
-  const [, setPendingReservation] = useState<{
+  const [pendingReservation, setPendingReservation] = useState<{
     propertyId: string;
     guestId: string;
     checkIn: string;
@@ -20,6 +21,20 @@ export function PropertyDetailView() {
     guestsCount: number;
     totalPrice: number;
   } | null>(null);
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+
+  const handleOpenConfirmation = (data: {
+    propertyId: string;
+    guestId: string;
+    checkIn: string;
+    checkOut: string;
+    guestsCount: number;
+    totalPrice: number;
+  }) => {
+    setPendingReservation(data);
+    setIsConfirmationModalOpen(true);
+  };
 
   return (
     <div className="animate-in fade-in pb-16">
@@ -40,10 +55,20 @@ export function PropertyDetailView() {
         <div className="lg:col-span-5 xl:col-span-4">
           <BookingWidget
             property={property}
-            onOpenConfirmationModal={(data) => setPendingReservation(data)}
+            onOpenConfirmationModal={handleOpenConfirmation}
           />
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {pendingReservation && (
+        <BookingConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={() => setIsConfirmationModalOpen(false)}
+          property={property}
+          bookingData={pendingReservation}
+        />
+      )}
     </div>
   );
 }
