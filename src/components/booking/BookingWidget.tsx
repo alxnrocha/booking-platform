@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
-import { ShieldCheck, AlertCircle, ChevronDown } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { ShieldCheck, AlertCircle, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { Property } from '../../types/stayhub.ts';
 import { useAuthStore } from '../../stores/useAuthStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 import { calculateBookingPrice } from '../../utils/pricing.ts';
+import { DateRangePickerPopover } from '../ui/DateRangePickerPopover.tsx';
 
 interface BookingWidgetProps {
   property: Property;
@@ -23,9 +24,22 @@ export function BookingWidget({ property, onOpenConfirmationModal }: BookingWidg
 
   const [checkIn, setCheckIn] = useState('2026-06-10');
   const [checkOut, setCheckOut] = useState('2026-06-13');
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [guestsCount, setGuestsCount] = useState(2);
   const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const datePickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setIsDatePickerOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Dynamic night calculation
   const nights = useMemo(() => {
@@ -86,45 +100,56 @@ export function BookingWidget({ property, onOpenConfirmationModal }: BookingWidg
       </div>
 
       {/* Date & Guest Picker Box */}
-      <div className="border border-slate-700 rounded-2xl overflow-hidden bg-[#0A0F1D]/80">
-        {/* Date Row */}
-        <div className="grid grid-cols-2 border-b border-slate-700">
+      <div className="border border-slate-700 rounded-2xl overflow-hidden bg-[#0A0F1D]/80 relative" ref={datePickerRef}>
+        {/* Date Row Button */}
+        <button
+          onClick={() => {
+            setIsDatePickerOpen(!isDatePickerOpen);
+            setIsGuestDropdownOpen(false);
+          }}
+          className="w-full grid grid-cols-2 border-b border-slate-700 hover:bg-slate-800/40 transition-colors text-left cursor-pointer"
+        >
           <div className="p-3 border-r border-slate-700">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 flex items-center gap-1">
+              <CalendarIcon className="w-3 h-3 text-rose-500" />
               CHECK-IN
             </label>
-            <input
-              type="date"
-              value={checkIn}
-              onChange={(e) => {
-                setCheckIn(e.target.value);
-                setErrorMessage(null);
-              }}
-              className="w-full bg-transparent text-xs font-semibold text-white focus:outline-none"
-            />
+            <div className="text-xs font-semibold text-white">{checkIn}</div>
           </div>
 
           <div className="p-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 flex items-center gap-1">
+              <CalendarIcon className="w-3 h-3 text-rose-500" />
               CHECK-OUT
             </label>
-            <input
-              type="date"
-              value={checkOut}
-              onChange={(e) => {
-                setCheckOut(e.target.value);
+            <div className="text-xs font-semibold text-white">{checkOut}</div>
+          </div>
+        </button>
+
+        {/* Date Range Picker Popover for Booking Widget */}
+        {isDatePickerOpen && (
+          <div className="absolute top-full left-0 right-0 z-50 pt-2 flex justify-center">
+            <DateRangePickerPopover
+              checkIn={checkIn}
+              checkOut={checkOut}
+              onSelectDates={(inDate, outDate) => {
+                if (inDate) setCheckIn(inDate);
+                if (outDate) setCheckOut(outDate);
                 setErrorMessage(null);
               }}
-              className="w-full bg-transparent text-xs font-semibold text-white focus:outline-none"
+              onClose={() => setIsDatePickerOpen(false)}
             />
           </div>
-        </div>
+        )}
 
         {/* Guests Row */}
         <div className="relative">
           <button
-            onClick={() => setIsGuestDropdownOpen(!isGuestDropdownOpen)}
-            className="w-full p-3 text-left flex items-center justify-between hover:bg-slate-800/30 transition-colors"
+            onClick={() => {
+              setIsGuestDropdownOpen(!isGuestDropdownOpen);
+              setIsDatePickerOpen(false);
+            }}
+            className="w-full p-3 text-left flex items-center justify-between hover:bg-slate-800/30 transition-colors cursor-pointer"
           >
             <div>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -145,7 +170,7 @@ export function BookingWidget({ property, onOpenConfirmationModal }: BookingWidg
                   <button
                     onClick={() => setGuestsCount(Math.max(1, guestsCount - 1))}
                     disabled={guestsCount <= 1}
-                    className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs"
+                    className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer"
                   >
                     -
                   </button>
@@ -153,7 +178,7 @@ export function BookingWidget({ property, onOpenConfirmationModal }: BookingWidg
                   <button
                     onClick={() => setGuestsCount(Math.min(property.maxGuests, guestsCount + 1))}
                     disabled={guestsCount >= property.maxGuests}
-                    className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs"
+                    className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer"
                   >
                     +
                   </button>
@@ -183,7 +208,7 @@ export function BookingWidget({ property, onOpenConfirmationModal }: BookingWidg
       <button
         onClick={handleReserveClick}
         disabled={isDateCollision}
-        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
       >
         Reserve Now
       </button>

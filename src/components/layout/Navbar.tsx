@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/useAuthStore.ts';
 import { useFilterStore } from '../../stores/useFilterStore.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 import { UserRole } from '../../types/stayhub.ts';
+import { DateRangePickerPopover } from '../ui/DateRangePickerPopover.tsx';
 
 export function Navbar() {
   const { currentUser, setRole } = useAuthStore();
@@ -11,6 +12,7 @@ export function Navbar() {
   const { currentView, setCurrentView, setSelectedPropertyId } = useBookingStore();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isGuestPopoverOpen, setIsGuestPopoverOpen] = useState(false);
 
@@ -21,6 +23,7 @@ export function Navbar() {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
+        setIsDatePickerOpen(false);
         setIsGuestPopoverOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -61,7 +64,7 @@ export function Navbar() {
           {/* Brand Logo */}
           <button
             onClick={handleLogoClick}
-            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-2xl flex-shrink-0"
+            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-2xl flex-shrink-0 cursor-pointer"
             aria-label="StayHub Home"
           >
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/30 group-hover:scale-105 transition-transform">
@@ -80,8 +83,12 @@ export function Navbar() {
             <div className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 hover:border-slate-600 rounded-full shadow-xl shadow-black/40 p-2 pl-6 text-xs text-slate-300 transition-all">
               {/* Destination Section */}
               <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors"
+                onClick={() => {
+                  setIsSearchOpen(!isSearchOpen);
+                  setIsDatePickerOpen(false);
+                  setIsGuestPopoverOpen(false);
+                }}
+                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
               >
                 <div className="font-bold text-white text-xs">Destination</div>
                 <div className="text-slate-400 truncate max-w-[160px] text-[11px]">
@@ -91,13 +98,17 @@ export function Navbar() {
 
               <div className="w-px h-7 bg-slate-700 mx-1" />
 
-              {/* Dates Section */}
+              {/* Dates Section (Opens Custom Calendar Popover) */}
               <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors"
+                onClick={() => {
+                  setIsDatePickerOpen(!isDatePickerOpen);
+                  setIsSearchOpen(false);
+                  setIsGuestPopoverOpen(false);
+                }}
+                className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
               >
                 <div className="font-bold text-white text-xs">Check in – Check out</div>
-                <div className="text-slate-400 truncate max-w-[150px] text-[11px]">
+                <div className="text-rose-400 font-medium truncate max-w-[150px] text-[11px]">
                   {checkIn && checkOut ? `${checkIn} - ${checkOut}` : 'Add dates'}
                 </div>
               </button>
@@ -106,8 +117,12 @@ export function Navbar() {
 
               {/* Guests Section */}
               <button
-                onClick={() => setIsGuestPopoverOpen(!isGuestPopoverOpen)}
-                className="px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors"
+                onClick={() => {
+                  setIsGuestPopoverOpen(!isGuestPopoverOpen);
+                  setIsSearchOpen(false);
+                  setIsDatePickerOpen(false);
+                }}
+                className="px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer"
               >
                 <div className="font-bold text-white text-xs">Guests</div>
                 <div className="text-slate-400 text-[11px]">
@@ -120,15 +135,17 @@ export function Navbar() {
                 onClick={() => {
                   if (currentView !== 'marketplace') setCurrentView('marketplace');
                   setIsSearchOpen(false);
+                  setIsDatePickerOpen(false);
+                  setIsGuestPopoverOpen(false);
                 }}
-                className="w-10 h-10 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center ml-2 shadow-lg shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all flex-shrink-0"
+                className="w-10 h-10 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center ml-2 shadow-lg shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all flex-shrink-0 cursor-pointer"
                 aria-label="Execute search"
               >
                 <Search className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Quick Search Popover */}
+            {/* Quick Destination Search Popover */}
             {isSearchOpen && (
               <div className="absolute top-16 left-0 right-0 bg-[#151E32] border border-slate-700 rounded-3xl p-5 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="mb-4">
@@ -145,27 +162,6 @@ export function Navbar() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Check-in Date</label>
-                    <input
-                      type="date"
-                      value={checkIn || ''}
-                      onChange={(e) => setDates(e.target.value || null, checkOut)}
-                      className="w-full bg-[#0A0F1D] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-400 block mb-1">Check-out Date</label>
-                    <input
-                      type="date"
-                      value={checkOut || ''}
-                      onChange={(e) => setDates(checkIn, e.target.value || null)}
-                      className="w-full bg-[#0A0F1D] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
-                    />
-                  </div>
-                </div>
-
                 <div>
                   <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
                     Popular Luxury Destinations
@@ -176,7 +172,7 @@ export function Navbar() {
                         <button
                           key={dest}
                           onClick={() => handleQuickSearch(dest)}
-                          className="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-500/20 hover:border-rose-500/40 border border-slate-700 rounded-xl text-xs text-slate-300 hover:text-white transition-all font-medium"
+                          className="px-3 py-1.5 bg-slate-800/80 hover:bg-rose-500/20 hover:border-rose-500/40 border border-slate-700 rounded-xl text-xs text-slate-300 hover:text-white transition-all font-medium cursor-pointer"
                         >
                           {dest}
                         </button>
@@ -184,6 +180,18 @@ export function Navbar() {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Custom Interactive Date Picker Popover */}
+            {isDatePickerOpen && (
+              <div className="absolute top-16 left-0 right-0 z-50 flex justify-center">
+                <DateRangePickerPopover
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  onSelectDates={(inDate, outDate) => setDates(inDate, outDate)}
+                  onClose={() => setIsDatePickerOpen(false)}
+                />
               </div>
             )}
 
@@ -199,14 +207,14 @@ export function Navbar() {
                     <button
                       onClick={() => setGuests(Math.max(1, guests - 1))}
                       disabled={guests <= 1}
-                      className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 disabled:opacity-30 text-white flex items-center justify-center font-bold"
+                      className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 disabled:opacity-30 text-white flex items-center justify-center font-bold cursor-pointer"
                     >
                       -
                     </button>
                     <span className="font-bold text-white text-sm">{guests}</span>
                     <button
                       onClick={() => setGuests(Math.min(16, guests + 1))}
-                      className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 text-white flex items-center justify-center font-bold"
+                      className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 text-white flex items-center justify-center font-bold cursor-pointer"
                     >
                       +
                     </button>
@@ -221,7 +229,7 @@ export function Navbar() {
             {/* My Trips */}
             <button
               onClick={() => setCurrentView('my-trips')}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
+              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                 currentView === 'my-trips'
                   ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -234,7 +242,7 @@ export function Navbar() {
             {/* Host Portal Toggle */}
             <button
               onClick={() => setCurrentView(currentView === 'host-portal' ? 'marketplace' : 'host-portal')}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
+              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                 currentView === 'host-portal'
                   ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700/60'
@@ -248,7 +256,7 @@ export function Navbar() {
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2.5 bg-[#151E32] border border-slate-700 hover:border-slate-600 rounded-full p-1.5 pl-3.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                className="flex items-center gap-2.5 bg-[#151E32] border border-slate-700 hover:border-slate-600 rounded-full p-1.5 pl-3.5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 cursor-pointer"
                 aria-label="User account and RBAC menu"
               >
                 <div className="text-left hidden lg:block pr-1">
@@ -276,7 +284,7 @@ export function Navbar() {
                     </div>
                     <button
                       onClick={() => handleRoleChange('GUEST')}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                         currentUser.role === 'GUEST'
                           ? 'bg-rose-500/10 text-rose-400 font-bold'
                           : 'text-slate-300 hover:bg-slate-800'
@@ -289,7 +297,7 @@ export function Navbar() {
                     </button>
                     <button
                       onClick={() => handleRoleChange('HOST')}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                         currentUser.role === 'HOST'
                           ? 'bg-rose-500/10 text-rose-400 font-bold'
                           : 'text-slate-300 hover:bg-slate-800'
@@ -302,7 +310,7 @@ export function Navbar() {
                     </button>
                     <button
                       onClick={() => handleRoleChange('ADMIN')}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
                         currentUser.role === 'ADMIN'
                           ? 'bg-rose-500/10 text-rose-400 font-bold'
                           : 'text-slate-300 hover:bg-slate-800'
@@ -321,7 +329,7 @@ export function Navbar() {
                         setCurrentView('my-trips');
                         setIsUserMenuOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-300 hover:bg-slate-800 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                       My Reservations
                     </button>
@@ -330,7 +338,7 @@ export function Navbar() {
                         setCurrentView('host-portal');
                         setIsUserMenuOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-300 hover:bg-slate-800 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                       Host Management Portal
                     </button>
