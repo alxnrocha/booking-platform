@@ -46,7 +46,13 @@ export function BookingWidget({
     return formatISODate(out);
   });
 
-  const [guestsCount, setGuestsCount] = useState<number>(2);
+  const [adults, setAdults] = useState<number>(2);
+  const [children, setChildren] = useState<number>(0);
+  const [infants, setInfants] = useState<number>(0);
+  const [pets, setPets] = useState<number>(0);
+
+  const totalGuests = adults + children;
+
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
@@ -155,7 +161,7 @@ export function BookingWidget({
       guestId: currentUser.id,
       checkIn,
       checkOut,
-      guestsCount,
+      guestsCount: totalGuests,
       totalPrice: priceBreakdown.grandTotal,
     });
   };
@@ -203,51 +209,140 @@ export function BookingWidget({
                 GUESTS
               </span>
               <span className="text-sm font-semibold text-white">
-                {guestsCount} {guestsCount === 1 ? 'guest' : 'guests'}
+                {totalGuests} {totalGuests === 1 ? 'guest' : 'guests'}
+                {infants > 0 && `, ${infants} infant${infants > 1 ? 's' : ''}`}
+                {pets > 0 && `, ${pets} pet${pets > 1 ? 's' : ''}`}
               </span>
             </div>
             <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isGuestDropdownOpen ? 'rotate-180 text-rose-400' : ''}`} />
           </button>
 
-          {/* Inline Expandable Guest Stepper */}
+          {/* Full Professional Multi-Category Guest Stepper Panel */}
           {isGuestDropdownOpen && (
             <div 
               onClick={(e) => e.stopPropagation()}
-              className="p-3.5 pt-2 pb-3.5 bg-[#121929] border-t border-slate-700/80 rounded-b-2xl animate-in fade-in duration-150"
+              className="p-4 space-y-3.5 bg-[#121929] border-t border-slate-700/80 rounded-b-2xl animate-in fade-in duration-150 text-left"
             >
-              <div className="flex items-center justify-between">
+              {/* 1. Adults */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-800/80">
                 <div>
-                  <span className="text-xs font-bold text-white block">Number of Guests</span>
-                  <span className="text-[10px] text-slate-400">Max {property.maxGuests} guests allowed</span>
+                  <div className="text-sm font-bold text-white">Adults</div>
+                  <div className="text-xs text-slate-400">Ages 13 or above</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setGuestsCount(Math.max(1, guestsCount - 1));
-                    }}
-                    disabled={guestsCount <= 1}
+                    onClick={() => setAdults(Math.max(1, adults - 1))}
+                    disabled={adults <= 1}
                     className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
-                    aria-label="Decrease guests"
+                    aria-label="Decrease adults"
                   >
                     -
                   </button>
-                  <span className="text-sm font-bold text-white w-4 text-center">{guestsCount}</span>
+                  <span className="w-5 text-center font-bold text-white text-sm">{adults}</span>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setGuestsCount(Math.min(property.maxGuests, guestsCount + 1));
-                    }}
-                    disabled={guestsCount >= property.maxGuests}
+                    onClick={() => setAdults(Math.min(property.maxGuests - children, adults + 1))}
+                    disabled={totalGuests >= property.maxGuests}
                     className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
-                    aria-label="Increase guests"
+                    aria-label="Increase adults"
                   >
                     +
                   </button>
                 </div>
               </div>
+
+              {/* 2. Children */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-800/80">
+                <div>
+                  <div className="text-sm font-bold text-white">Children</div>
+                  <div className="text-xs text-slate-400">Ages 2–12</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setChildren(Math.max(0, children - 1))}
+                    disabled={children <= 0}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Decrease children"
+                  >
+                    -
+                  </button>
+                  <span className="w-5 text-center font-bold text-white text-sm">{children}</span>
+                  <button
+                    type="button"
+                    onClick={() => setChildren(Math.min(property.maxGuests - adults, children + 1))}
+                    disabled={totalGuests >= property.maxGuests}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Increase children"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* 3. Infants */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-800/80">
+                <div>
+                  <div className="text-sm font-bold text-white">Infants</div>
+                  <div className="text-xs text-slate-400">Under 2</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setInfants(Math.max(0, infants - 1))}
+                    disabled={infants <= 0}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Decrease infants"
+                  >
+                    -
+                  </button>
+                  <span className="w-5 text-center font-bold text-white text-sm">{infants}</span>
+                  <button
+                    type="button"
+                    onClick={() => setInfants(Math.min(5, infants + 1))}
+                    disabled={infants >= 5}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Increase infants"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. Pets */}
+              <div className="flex items-center justify-between py-1">
+                <div>
+                  <div className="text-sm font-bold text-white">Pets</div>
+                  <div className="text-xs text-slate-400">Bringing a service animal?</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPets(Math.max(0, pets - 1))}
+                    disabled={pets <= 0}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Decrease pets"
+                  >
+                    -
+                  </button>
+                  <span className="w-5 text-center font-bold text-white text-sm">{pets}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPets(Math.min(3, pets + 1))}
+                    disabled={pets >= 3}
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Increase pets"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Max capacity info note */}
+              <p className="text-[11px] text-slate-400 pt-2 leading-relaxed border-t border-slate-800">
+                This place has a maximum of <strong className="text-white">{property.maxGuests} guests</strong>, not including infants. Pets may be subject to house rules.
+              </p>
             </div>
           )}
         </div>
