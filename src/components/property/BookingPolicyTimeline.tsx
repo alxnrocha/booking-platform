@@ -27,21 +27,28 @@ export function BookingPolicyTimeline({ cancellationDays }: BookingPolicyTimelin
   ];
 
   return (
-    <div className="py-6 space-y-4">
-      <h3 className="text-base font-bold text-white tracking-tight">
+    <div className="py-8 space-y-6">
+      <h3 className="text-xl font-extrabold text-white tracking-tight">
         Booking policy
       </h3>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {steps.map((step) => (
-          <div key={step.num} className="space-y-1.5">
-            <div className="w-6 h-6 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
-              {step.num}
+      <div className="relative pt-2">
+        {/* Glowing Gradient Connecting Progress Line */}
+        <div className="absolute top-[16px] left-6 right-0 h-[2px] bg-gradient-to-r from-[#E51D52] via-[#E51D52]/50 to-transparent z-0 hidden sm:block" />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-10">
+          {steps.map((step) => (
+            <div key={step.num} className="space-y-2.5">
+              <div className="w-9 h-9 rounded-full bg-[#E51D52] text-white text-xs font-black flex items-center justify-center shadow-[0_0_16px_rgba(229,29,82,0.7)] ring-4 ring-[#0A0F1D]">
+                {step.num}
+              </div>
+              <div className="pt-1 space-y-0.5">
+                <div className="text-base sm:text-lg font-bold text-white leading-tight">{step.title}</div>
+                <div className="text-sm text-slate-400 leading-snug">{step.desc}</div>
+              </div>
             </div>
-            <div className="text-xs font-bold text-white">{step.title}</div>
-            <div className="text-[11px] text-slate-400 leading-snug">{step.desc}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

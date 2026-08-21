@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ShieldCheck, ChevronDown, Calendar as CalendarIcon, AlertCircle, X } from 'lucide-react';
+import { ShieldCheck, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { Property } from '../../types/stayhub.ts';
 import { useBookingStore } from '../../stores/useBookingStore.ts';
 import { useFilterStore } from '../../stores/useFilterStore.ts';
@@ -19,6 +19,13 @@ interface BookingWidgetProps {
   }) => void;
 }
 
+const formatISODate = (d: Date) => {
+  const y = d.getFullYear();
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 export function BookingWidget({
   property,
   onOpenConfirmationModal,
@@ -27,11 +34,22 @@ export function BookingWidget({
   const { checkIn: filterCheckIn, checkOut: filterCheckOut, setDates } = useFilterStore();
   const { currentUser } = useAuthStore();
 
-  const [checkIn, setLocalCheckIn] = useState<string>(filterCheckIn || '2026-06-10');
-  const [checkOut, setLocalCheckOut] = useState<string>(filterCheckOut || '2026-06-13');
+  const [checkIn, setLocalCheckIn] = useState<string>(() => {
+    if (filterCheckIn) return filterCheckIn;
+    return formatISODate(new Date());
+  });
+
+  const [checkOut, setLocalCheckOut] = useState<string>(() => {
+    if (filterCheckOut) return filterCheckOut;
+    const out = new Date();
+    out.setDate(out.getDate() + 3);
+    return formatISODate(out);
+  });
+
   const [guestsCount, setGuestsCount] = useState<number>(2);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const widgetRef = useRef<HTMLDivElement>(null);
@@ -57,6 +75,22 @@ export function BookingWidget({
     const diff = new Date(outDate).getTime() - new Date(inDate).getTime();
     if (isNaN(diff) || diff <= 0) return 1;
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const formatDisplayDate = (dateStr: string) => {
+    if (!dateStr) return 'Add date';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  const formatShortDate = (dateStr: string) => {
+    if (!dateStr) return 'Add date';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}`;
   };
 
   const nights = calculateNights(checkIn, checkOut);
@@ -94,6 +128,7 @@ export function BookingWidget({
     }
 
     setErrorMessage(null);
+    setIsMobileExpanded(false);
     onOpenConfirmationModal({
       propertyId: property.id,
       guestId: currentUser.id,
@@ -104,198 +139,336 @@ export function BookingWidget({
     });
   };
 
-  return (
-    <div
-      ref={widgetRef}
-      className="sticky top-28 bg-[#151E32] border border-slate-700/80 rounded-3xl p-6 shadow-2xl space-y-6"
-    >
-      {/* Price Header */}
-      <div className="flex items-baseline justify-between">
-        <div>
-          <span className="text-2xl font-extrabold text-white">€{property.pricePerNight}</span>
-          <span className="text-sm text-slate-400 font-medium"> / night</span>
-        </div>
-      </div>
+  // Reusable Date & Guest Picker Controls
+  const renderPickerControls = () => (
+    <div className="space-y-2">
+      <div className="border border-slate-700/80 rounded-2xl bg-[#080D1A] divide-y divide-slate-800 overflow-hidden shadow-inner">
+        {/* Date Selector Row */}
+        <button
+          onClick={() => {
+            setIsDatePickerOpen(true);
+            setIsGuestDropdownOpen(false);
+          }}
+          className="w-full grid grid-cols-2 hover:bg-slate-800/40 transition-colors text-left cursor-pointer group"
+        >
+          <div className="p-3.5 border-r border-slate-800">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 group-hover:text-rose-400 transition-colors">
+              CHECK-IN
+            </label>
+            <div className="text-sm font-semibold text-white">{formatDisplayDate(checkIn)}</div>
+          </div>
 
-      {/* Date & Guest Picker Box Container */}
-      <div className="space-y-2">
-        <div className="border border-slate-700 rounded-2xl bg-[#0A0F1D]/80 divide-y divide-slate-700">
-          {/* Date Selector Row */}
+          <div className="p-3.5">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 group-hover:text-rose-400 transition-colors">
+              CHECK-OUT
+            </label>
+            <div className="text-sm font-semibold text-white">{formatDisplayDate(checkOut)}</div>
+          </div>
+        </button>
+
+        {/* Guests Selector Row */}
+        <div className="relative">
           <button
             onClick={() => {
-              setIsDatePickerOpen(true);
-              setIsGuestDropdownOpen(false);
+              setIsGuestDropdownOpen(!isGuestDropdownOpen);
             }}
-            className="w-full grid grid-cols-2 rounded-t-2xl hover:bg-slate-800/40 transition-colors text-left cursor-pointer group"
+            className="w-full p-3.5 text-left flex items-center justify-between hover:bg-slate-800/30 transition-colors cursor-pointer"
           >
-            <div className="p-3 border-r border-slate-700">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 flex items-center gap-1 group-hover:text-rose-400 transition-colors">
-                <CalendarIcon className="w-3 h-3 text-rose-500" />
-                CHECK-IN
-              </label>
-              <div className="text-xs font-semibold text-white">{checkIn || 'Add date'}</div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                GUESTS
+              </span>
+              <span className="text-sm font-semibold text-white">
+                {guestsCount} {guestsCount === 1 ? 'guest' : 'guests'}
+              </span>
             </div>
-
-            <div className="p-3">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 flex items-center gap-1 group-hover:text-rose-400 transition-colors">
-                <CalendarIcon className="w-3 h-3 text-rose-500" />
-                CHECK-OUT
-              </label>
-              <div className="text-xs font-semibold text-white">{checkOut || 'Add date'}</div>
-            </div>
+            <ChevronDown className="w-4 h-4 text-slate-400" />
           </button>
 
-          {/* Guests Selector Row */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setIsGuestDropdownOpen(!isGuestDropdownOpen);
-              }}
-              className="w-full p-3 text-left flex items-center justify-between rounded-b-2xl hover:bg-slate-800/30 transition-colors cursor-pointer"
-            >
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  GUESTS
-                </span>
-                <span className="text-xs font-semibold text-white">
-                  {guestsCount} {guestsCount === 1 ? 'guest' : 'guests'}
-                </span>
-              </div>
-              <ChevronDown className="w-4 h-4 text-slate-400" />
-            </button>
-
-            {isGuestDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#151E32] border border-slate-700 rounded-2xl p-4 shadow-2xl z-30 animate-in fade-in slide-in-from-top-1">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs font-bold text-white block">Guests</span>
-                    <span className="text-[10px] text-slate-400">Max {property.maxGuests} guests</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setGuestsCount(Math.max(1, guestsCount - 1))}
-                      disabled={guestsCount <= 1}
-                      className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
-                    >
-                      -
-                    </button>
-                    <span className="text-xs font-bold text-white w-4 text-center">{guestsCount}</span>
-                    <button
-                      onClick={() => setGuestsCount(Math.min(property.maxGuests, guestsCount + 1))}
-                      disabled={guestsCount >= property.maxGuests}
-                      className="w-7 h-7 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Prominent Modal/Popover Calendar for Date Selection */}
-        {isDatePickerOpen && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="relative bg-[#151E32] border border-slate-700 rounded-3xl p-5 shadow-2xl max-w-2xl w-full">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+          {isGuestDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-[#121929] border border-slate-700 rounded-2xl p-4 shadow-2xl z-30 animate-in fade-in slide-in-from-top-1">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-white">Select Travel Dates</h3>
-                  <p className="text-xs text-slate-400">
-                    {checkIn && checkOut ? `${checkIn} to ${checkOut} (${nights} nights)` : 'Pick check-in and check-out'}
-                  </p>
+                  <span className="text-xs font-bold text-white block">Guests</span>
+                  <span className="text-[10px] text-slate-400">Max {property.maxGuests} guests</span>
                 </div>
-                <button
-                  onClick={() => setIsDatePickerOpen(false)}
-                  className="p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex justify-center">
-                <DateRangePickerPopover
-                  checkIn={checkIn}
-                  checkOut={checkOut}
-                  onSelectDates={(inDate, outDate) => {
-                    if (inDate) {
-                      setLocalCheckIn(inDate);
-                    }
-                    if (outDate) {
-                      setLocalCheckOut(outDate);
-                    }
-                    setDates(inDate, outDate);
-                    setErrorMessage(null);
-                    if (inDate && outDate) {
-                      setIsDatePickerOpen(false);
-                    }
-                  }}
-                  onClose={() => setIsDatePickerOpen(false)}
-                />
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setGuestsCount(Math.max(1, guestsCount - 1))}
+                    disabled={guestsCount <= 1}
+                    className="w-8 h-8 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
+                  >
+                    -
+                  </button>
+                  <span className="text-xs font-bold text-white w-4 text-center">{guestsCount}</span>
+                  <button
+                    onClick={() => setGuestsCount(Math.min(property.maxGuests, guestsCount + 1))}
+                    disabled={guestsCount >= property.maxGuests}
+                    className="w-8 h-8 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Collision Warning */}
-      {isDateCollision && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span>These dates are already reserved by another guest.</span>
+          )}
         </div>
-      )}
-
-      {/* Error Banner */}
-      {errorMessage && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
-          {errorMessage}
-        </div>
-      )}
-
-      {/* Reserve Now CTA Button */}
-      <button
-        onClick={handleReserveClick}
-        disabled={isDateCollision}
-        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
-      >
-        Reserve Now
-      </button>
-
-      <p className="text-center text-[11px] text-slate-400">
-        You won't be charged yet
-      </p>
-
-      {/* Transparent Pricing Breakdown */}
-      <div className="space-y-2.5 pt-4 border-t border-slate-800 text-xs">
-        <div className="flex items-center justify-between text-slate-300">
-          <span>
-            €{property.pricePerNight} x {nights} {nights === 1 ? 'night' : 'nights'}
-          </span>
-          <span>€{priceBreakdown.baseTotal}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-slate-300">
-          <span>Cleaning fee</span>
-          <span>€{priceBreakdown.cleaningFee}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-slate-300">
-          <span>StayHub service fee</span>
-          <span>€{priceBreakdown.serviceFee}</span>
-        </div>
-
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between font-extrabold text-sm text-white">
-          <span>Total</span>
-          <span className="text-rose-400">€{priceBreakdown.grandTotal} EUR</span>
-        </div>
-      </div>
-
-      {/* Security note */}
-      <div className="flex items-center gap-2 pt-2 text-[11px] text-slate-400 border-t border-slate-800/80">
-        <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-        <span>Free cancellation up to {property.cancellationDays} days before check-in</span>
       </div>
     </div>
+  );
+
+  // Reusable Price Breakdown
+  const renderPriceBreakdown = () => (
+    <div className="space-y-3 pt-2 text-sm">
+      <div className="flex items-center justify-between text-slate-300">
+        <span>
+          €{property.pricePerNight} x {nights} {nights === 1 ? 'night' : 'nights'}
+        </span>
+        <span className="font-semibold text-white">€{priceBreakdown.baseTotal}</span>
+      </div>
+
+      <div className="flex items-center justify-between text-slate-300">
+        <span>Cleaning fee</span>
+        <span className="font-semibold text-white">€{priceBreakdown.cleaningFee}</span>
+      </div>
+
+      <div className="flex items-center justify-between text-slate-300">
+        <span>Service fee</span>
+        <span className="font-semibold text-white">€{priceBreakdown.serviceFee}</span>
+      </div>
+
+      <div className="pt-3 border-t border-slate-800/90 flex items-center justify-between font-black text-base text-white">
+        <span>Total</span>
+        <span className="text-white">€{priceBreakdown.grandTotal.toLocaleString()} EUR</span>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* ========================================================================= */}
+      {/* 1. DESKTOP INLINE STICKY CARD (Visible on lg screens and above)            */}
+      {/* ========================================================================= */}
+      <div
+        ref={widgetRef}
+        className="hidden lg:block relative bg-[#101726] border border-slate-800/90 rounded-3xl p-7 shadow-2xl space-y-6"
+      >
+        {/* Price Header */}
+        <div className="flex items-baseline justify-between">
+          <div>
+            <span className="text-3xl font-black text-white tracking-tight">€{property.pricePerNight}</span>
+            <span className="text-sm text-slate-400 font-medium ml-1.5">/ night</span>
+          </div>
+        </div>
+
+        {/* Date & Guest Picker Controls */}
+        {renderPickerControls()}
+
+        {/* Pricing Breakdown */}
+        {renderPriceBreakdown()}
+
+        {/* Collision Warning */}
+        {isDateCollision && (
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>These dates are already reserved by another guest.</span>
+          </div>
+        )}
+
+        {/* Error Banner */}
+        {errorMessage && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+            {errorMessage}
+          </div>
+        )}
+
+        {/* Big Glowing Reserve Now CTA Button */}
+        <div className="space-y-2 pt-1">
+          <button
+            onClick={handleReserveClick}
+            disabled={isDateCollision}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF385C] to-[#E51D52] hover:from-[#E51D52] hover:to-[#D41446] text-white text-base font-extrabold shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+          >
+            Reserve Now
+          </button>
+
+          <p className="text-center text-xs text-slate-400">
+            You won't be charged yet
+          </p>
+        </div>
+
+        {/* Security note */}
+        <div className="flex items-center gap-2 pt-3 text-xs text-slate-400 border-t border-slate-800/80">
+          <ShieldCheck className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <span>Free cancellation up to {property.cancellationDays} days before check-in</span>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. MOBILE STICKY BOTTOM BAR (Always visible at the bottom on mobile)      */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1526]/95 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-4 sm:px-6 py-3 flex items-center justify-between">
+        {/* Left price & dates summary info */}
+        <div 
+          onClick={() => setIsMobileExpanded(true)}
+          className="flex flex-col cursor-pointer group"
+        >
+          <div className="flex items-baseline gap-1">
+            <span className="text-base sm:text-lg font-black text-white">€{property.pricePerNight}</span>
+            <span className="text-xs text-slate-400">/ night</span>
+          </div>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDatePickerOpen(true);
+            }}
+            className="text-[11px] font-bold text-rose-400 underline underline-offset-2 hover:text-rose-300 text-left flex items-center gap-1 cursor-pointer"
+          >
+            <span>{formatShortDate(checkIn)} – {formatShortDate(checkOut)}</span>
+            <span className="text-slate-400 font-normal">({nights}n)</span>
+          </button>
+        </div>
+
+        {/* Right actions: Expand arrow button + Quick Reserve button */}
+        <div className="flex items-center gap-2">
+          {/* Beautiful arrow button with glowing hover effect */}
+          <button
+            onClick={() => setIsMobileExpanded(!isMobileExpanded)}
+            className="w-10 h-10 rounded-full bg-[#161F33] border border-slate-700 hover:border-rose-500/50 hover:bg-slate-800 text-rose-400 flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer group"
+            aria-label="Expand booking summary details"
+            title="Expand summary"
+          >
+            <ChevronUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+          </button>
+
+          {/* Reserve CTA */}
+          <button
+            onClick={handleReserveClick}
+            disabled={isDateCollision}
+            className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF385C] to-[#E51D52] hover:from-[#E51D52] hover:to-[#D41446] text-white text-xs sm:text-sm font-bold shadow-lg shadow-rose-500/25 active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
+          >
+            Reserve
+          </button>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. MOBILE EXPANDED BOTTOM SHEET DRAWER (Slides up smoothly on mobile)     */}
+      {/* ========================================================================= */}
+      {isMobileExpanded && (
+        <>
+          {/* Backdrop overlay */}
+          <div
+            onClick={() => setIsMobileExpanded(false)}
+            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
+          />
+
+          {/* Bottom Sheet Drawer Modal */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#101726] border-t border-slate-700/90 rounded-t-[32px] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] p-5 pb-8 max-h-[85vh] overflow-y-auto lg:hidden animate-in slide-in-from-bottom duration-300 space-y-5">
+            {/* Top Drag Pill & Header */}
+            <div className="flex flex-col items-center">
+              <button
+                onClick={() => setIsMobileExpanded(false)}
+                className="w-12 h-1.5 bg-slate-600 hover:bg-slate-500 rounded-full mb-3 cursor-pointer"
+                aria-label="Close summary"
+              />
+              
+              <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800">
+                <div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-white tracking-tight">€{property.pricePerNight}</span>
+                    <span className="text-xs text-slate-400 font-medium">/ night</span>
+                  </div>
+                  <div className="text-xs text-slate-400 mt-0.5">
+                    {formatDisplayDate(checkIn)} to {formatDisplayDate(checkOut)} ({nights} nights)
+                  </div>
+                </div>
+
+                {/* Smooth downward collapse arrow button */}
+                <button
+                  onClick={() => setIsMobileExpanded(false)}
+                  className="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-rose-400 border border-slate-700 flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all"
+                  aria-label="Collapse drawer"
+                >
+                  <ChevronDown className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Date & Guest Picker Controls */}
+            {renderPickerControls()}
+
+            {/* Price Breakdown */}
+            {renderPriceBreakdown()}
+
+            {/* Collision Warning */}
+            {isDateCollision && (
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>These dates are already reserved by another guest.</span>
+              </div>
+            )}
+
+            {/* Error Banner */}
+            {errorMessage && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+                {errorMessage}
+              </div>
+            )}
+
+            {/* Reserve CTA in Mobile Drawer */}
+            <div className="space-y-1.5 pt-1">
+              <button
+                onClick={handleReserveClick}
+                disabled={isDateCollision}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF385C] to-[#E51D52] hover:from-[#E51D52] hover:to-[#D41446] text-white text-sm font-extrabold shadow-lg shadow-rose-500/30 active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer"
+              >
+                Reserve Now
+              </button>
+              <p className="text-center text-[11px] text-slate-400">
+                You won't be charged yet
+              </p>
+            </div>
+
+            {/* Security note */}
+            <div className="flex items-center gap-2 pt-2 text-xs text-slate-400 border-t border-slate-800/80">
+              <ShieldCheck className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <span>Free cancellation up to {property.cancellationDays} days before check-in</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. DUAL-MONTH CALENDAR MODAL (Shared by Desktop & Mobile)                 */}
+      {/* ========================================================================= */}
+      {isDatePickerOpen && (
+        <div
+          onClick={() => setIsDatePickerOpen(false)}
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative max-w-2xl lg:max-w-3xl w-full flex justify-center">
+            <DateRangePickerPopover
+              checkIn={checkIn}
+              checkOut={checkOut}
+              onSelectDates={(inDate, outDate) => {
+                if (inDate) {
+                  setLocalCheckIn(inDate);
+                }
+                if (outDate) {
+                  setLocalCheckOut(outDate);
+                }
+                setDates(inDate, outDate);
+                setErrorMessage(null);
+                if (inDate && outDate) {
+                  setIsDatePickerOpen(false);
+                }
+              }}
+              onClose={() => setIsDatePickerOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

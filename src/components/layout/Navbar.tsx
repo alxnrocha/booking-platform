@@ -84,8 +84,13 @@ export function Navbar() {
             </span>
           </button>
 
-          {/* Floating Pill Search Bar (Desktop / Tablet) */}
-          <div ref={searchRef} className="hidden md:flex items-center justify-center flex-1 max-w-3xl px-2 relative">
+          {/* Floating Pill Search Bar (Desktop / Tablet - Visible on Marketplace) */}
+          <div
+            ref={searchRef}
+            className={`hidden md:flex items-center justify-center flex-1 max-w-3xl px-2 relative transition-opacity ${
+              currentView === 'property-detail' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
+          >
             <div className="w-full flex items-center justify-between bg-[#151E32] border border-slate-700/80 hover:border-slate-600 rounded-full shadow-xl shadow-black/40 p-2 pl-6 text-xs text-slate-300 transition-all">
               {/* Destination Section */}
               <button
@@ -96,8 +101,8 @@ export function Navbar() {
                 }}
                 className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[140px]"
               >
-                <div className="font-bold text-white text-xs">Destination</div>
-                <div className="text-slate-400 truncate max-w-[180px] text-[11px]">
+                <div className="font-bold text-white text-[13px] tracking-tight">Destination</div>
+                <div className="text-slate-400 truncate max-w-[180px] text-xs font-normal mt-0.5">
                   {destination || 'Where are you going?'}
                 </div>
               </button>
@@ -113,8 +118,8 @@ export function Navbar() {
                 }}
                 className="flex-1 px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[170px]"
               >
-                <div className="font-bold text-white text-xs">Check in – Check out</div>
-                <div className={`text-[11px] font-semibold ${checkIn ? 'text-rose-400 font-bold' : 'text-slate-400'}`}>
+                <div className="font-bold text-white text-[13px] tracking-tight">Check in – Check out</div>
+                <div className={`text-xs mt-0.5 ${checkIn ? 'text-rose-400 font-bold' : 'text-slate-400 font-normal'}`}>
                   {formattedDates}
                 </div>
               </button>
@@ -130,8 +135,8 @@ export function Navbar() {
                 }}
                 className="px-4 py-1.5 text-left hover:bg-slate-800/60 rounded-full transition-colors cursor-pointer min-w-[90px]"
               >
-                <div className="font-bold text-white text-xs">Guests</div>
-                <div className="text-slate-400 text-[11px]">
+                <div className="font-bold text-white text-[13px] tracking-tight">Guests</div>
+                <div className="text-slate-400 text-xs font-normal mt-0.5">
                   {guests} {guests === 1 ? 'guest' : 'guests'}
                 </div>
               </button>
@@ -173,7 +178,7 @@ export function Navbar() {
                     Popular Luxury Destinations
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {['Amalfi Coast', 'Costa Brava', 'Algarve', 'Malibu', 'Santorini', 'Bali', 'Lake Como', 'Tulum', 'Dubai'].map(
+                    {['Barcelona', 'Madrid', 'Paris', 'Trancoso', 'Rio de Janeiro', 'Amalfi Coast', 'Costa Brava', 'Algarve', 'Saint-Tropez', 'Florianópolis', 'Santorini', 'Bali', 'Lake Como'].map(
                       (dest) => (
                         <button
                           key={dest}
@@ -356,30 +361,32 @@ export function Navbar() {
         </div>
 
         {/* Elevated Luxury Mobile Search Pill (Airbnb App Style) */}
-        <div className="md:hidden pb-4 pt-1">
-          <button
-            onClick={() => setIsMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-[#121929] border border-slate-700/90 hover:border-slate-600 rounded-full p-2 pl-3 pr-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-left cursor-pointer group active:scale-[0.99] transition-all"
-          >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-md shadow-rose-500/30 flex-shrink-0 group-hover:scale-105 transition-transform">
-                <Search className="w-4 h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-white truncate">
-                  {destination || 'Where to?'}
+        {currentView === 'marketplace' && (
+          <div className="md:hidden pb-4 pt-1">
+            <button
+              onClick={() => setIsMobileSearchOpen(true)}
+              className="w-full flex items-center justify-between bg-[#121929] border border-slate-700/90 hover:border-slate-600 rounded-full p-2 pl-3 pr-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] text-left cursor-pointer group active:scale-[0.99] transition-all"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-600 to-rose-500 text-white flex items-center justify-center shadow-md shadow-rose-500/30 flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <Search className="w-4 h-4" />
                 </div>
-                <div className="text-[11px] text-slate-400 font-medium truncate">
-                  {formattedDates !== 'Add dates' ? formattedDates : 'Anywhere'} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-white truncate">
+                    {destination || 'Where to?'}
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-medium truncate">
+                    {formattedDates !== 'Add dates' ? formattedDates : 'Anywhere'} · {guests} {guests === 1 ? 'guest' : 'guests'}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="w-8 h-8 rounded-full border border-slate-700/80 bg-[#070B14] flex items-center justify-center text-slate-300 flex-shrink-0">
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-            </div>
-          </button>
-        </div>
+              <div className="w-8 h-8 rounded-full border border-slate-700/80 bg-[#070B14] flex items-center justify-center text-slate-300 flex-shrink-0">
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+              </div>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Full-Screen Mobile Search Modal (Rendered via React Portal) */}

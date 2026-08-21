@@ -1,4 +1,5 @@
-import { Property, User, Reservation, Review } from '../types/stayhub.ts';
+import { Property, User, Reservation, Review, Amenity } from '../types/stayhub.ts';
+import { extraProperties50 } from './extraProperties.ts';
 
 export const mockUsers: User[] = [
   {
@@ -39,6 +40,17 @@ export const mockUsers: User[] = [
   },
 ];
 
+const standardLuxuryAmenities: Amenity[] = [
+  { id: 'wifi', name: 'Fast Wi-Fi', description: '500 Mbps', iconName: 'Wifi' },
+  { id: 'workspace', name: 'Dedicated workspace', description: 'Desk & monitor', iconName: 'Laptop' },
+  { id: 'pool', name: 'Private pool', description: 'Infinity pool', iconName: 'Waves' },
+  { id: 'oceanfront', name: 'Oceanfront', description: 'Direct sea access', iconName: 'Compass' },
+  { id: 'ev', name: 'EV charger', description: 'Electric vehicle charger', iconName: 'Zap' },
+  { id: 'ac', name: 'Air conditioning', description: 'Throughout villa', iconName: 'Wind' },
+  { id: 'parking', name: 'Free parking', description: '2 parking spaces', iconName: 'Car' },
+  { id: 'washer', name: 'Washing machine', description: 'In-unit laundry', iconName: 'Shirt' },
+];
+
 export const mockProperties: Property[] = [
   {
     id: 'prop_amalfi_villa',
@@ -63,21 +75,12 @@ export const mockProperties: Property[] = [
     baths: 3,
     images: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Fast Wi-Fi', description: '500 Mbps high speed', iconName: 'Wifi' },
-      { id: 'workspace', name: 'Dedicated workspace', description: 'Desk & 4K monitor', iconName: 'Laptop' },
-      { id: 'pool', name: 'Private pool', description: 'Heated infinity pool', iconName: 'Waves' },
-      { id: 'oceanfront', name: 'Oceanfront', description: 'Direct sea access', iconName: 'Compass' },
-      { id: 'ev', name: 'EV charger', description: 'Electric vehicle charger', iconName: 'Zap' },
-      { id: 'ac', name: 'Air conditioning', description: 'Throughout villa', iconName: 'Wind' },
-      { id: 'parking', name: 'Free parking', description: '2 private parking spaces', iconName: 'Car' },
-      { id: 'washer', name: 'Washing machine', description: 'In-unit laundry', iconName: 'Shirt' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Master Bedroom', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Bedroom 2', bedType: 'Queen bed', bedCount: 1 },
@@ -115,12 +118,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Fast Wi-Fi', description: 'Gigabit fiber', iconName: 'Wifi' },
-      { id: 'pool', name: 'Private pool', description: 'Saltwater pool', iconName: 'Waves' },
-      { id: 'oceanfront', name: 'Oceanfront', description: 'Cliff pathway to private cove', iconName: 'Compass' },
-      { id: 'parking', name: 'Free parking', description: 'Gated parking', iconName: 'Car' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Master Suite', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Guest Suite', bedType: 'Queen bed', bedCount: 1 },
@@ -158,11 +156,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Fast Wi-Fi', description: '500 Mbps', iconName: 'Wifi' },
-      { id: 'pool', name: 'Infinity Pool', description: 'Panoramic cliff edge', iconName: 'Waves' },
-      { id: 'ac', name: 'Climate Control', description: 'Smart HVAC system', iconName: 'Wind' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Master Bedroom', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Bedroom 2', bedType: 'Queen bed', bedCount: 1 },
@@ -199,11 +193,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'High-speed Wi-Fi', description: '1000 Mbps', iconName: 'Wifi' },
-      { id: 'oceanfront', name: 'Direct Beach Access', description: 'Private stairs to sand', iconName: 'Compass' },
-      { id: 'ev', name: 'Tesla Wall Connector', description: 'Dual chargers', iconName: 'Zap' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Master Suite', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Bedroom 2', bedType: 'Queen bed', bedCount: 1 },
@@ -241,10 +231,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Fast Wi-Fi', description: '300 Mbps', iconName: 'Wifi' },
-      { id: 'pool', name: 'Heated Cave Jacuzzi', description: 'Caldera view', iconName: 'Waves' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Cave Suite', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Mezzanine', bedType: 'Double bed', bedCount: 1 },
@@ -276,15 +263,12 @@ export const mockProperties: Property[] = [
     baths: 2,
     images: [
       'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Starlink Wi-Fi', description: 'Fast satellite connection', iconName: 'Wifi' },
-      { id: 'pool', name: 'Jungle Pool', description: 'Overlooking ravine', iconName: 'Waves' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Open Pavilion', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Tree Bedroom', bedType: 'Queen bed', bedCount: 1 },
@@ -321,10 +305,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Fast Wi-Fi', description: 'Whole-estate mesh', iconName: 'Wifi' },
-      { id: 'dock', name: 'Private Boat Dock', description: 'Direct lake access', iconName: 'Compass' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Master Fresco Suite', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Garden Suite', bedType: 'Queen bed', bedCount: 1 },
@@ -359,13 +340,10 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Solar Wi-Fi', description: 'High-speed mesh', iconName: 'Wifi' },
-      { id: 'plunge', name: 'Rooftop Plunge Pool', description: 'Canopy level', iconName: 'Waves' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Canopy Suite', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Nest Room', bedType: 'Queen bed', bedCount: 1 },
@@ -402,10 +380,7 @@ export const mockProperties: Property[] = [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
     ],
-    amenities: [
-      { id: 'wifi', name: 'Gigabit Fiber', description: '1000 Mbps', iconName: 'Wifi' },
-      { id: 'jacuzzi', name: 'Sky Jacuzzi', description: 'Burj view', iconName: 'Waves' },
-    ],
+    amenities: standardLuxuryAmenities,
     sleepingDetails: [
       { roomName: 'Grand Master', bedType: 'King bed', bedCount: 1 },
       { roomName: 'Sky Suite', bedType: 'Queen bed', bedCount: 1 },
@@ -415,6 +390,7 @@ export const mockProperties: Property[] = [
     instantBooking: true,
     isFavorite: false,
   },
+  ...extraProperties50,
 ];
 
 export const mockReservations: Reservation[] = [

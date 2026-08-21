@@ -6,6 +6,10 @@ export function MobileBottomNav() {
   const { currentView, setCurrentView, reservations } = useBookingStore();
   const { currentUser } = useAuthStore();
 
+  if (currentView === 'property-detail') {
+    return null;
+  }
+
   const userActiveBookings = reservations.filter(
     (r) => r.guestId === currentUser.id && r.status === 'CONFIRMED'
   ).length;

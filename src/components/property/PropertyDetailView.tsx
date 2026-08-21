@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PropertyHeader } from './PropertyHeader.tsx';
+import { PropertyTitleBar, PropertyGallery } from './PropertyHeader.tsx';
 import { HostProfileCard } from './HostProfileCard.tsx';
 import { BedroomCards } from './BedroomCards.tsx';
 import { AmenitiesGrid } from './AmenitiesGrid.tsx';
@@ -37,22 +37,26 @@ export function PropertyDetailView() {
   };
 
   return (
-    <div className="animate-in fade-in pb-16">
-      {/* Top Header with breadcrumbs, title and 5-photo masonry gallery */}
-      <PropertyHeader property={property} />
+    <div className="max-w-[1680px] mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pt-6 animate-in fade-in">
+      
+      {/* Title Bar is placed above the grid to ensure photos align with the booking widget */}
+      <PropertyTitleBar property={property} />
 
-      {/* 2-Column Split: Content & Sticky Booking Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
-        {/* Left Detailed Content Column */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-2">
-          <HostProfileCard property={property} />
-          <BedroomCards sleepingDetails={property.sleepingDetails} />
-          <AmenitiesGrid amenities={property.amenities} />
-          <BookingPolicyTimeline cancellationDays={property.cancellationDays} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 w-full items-start">
+        {/* Left Detailed Content Column (7 of 12 cols / 8 of 12 on large screens) */}
+        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-10">
+          <PropertyGallery property={property} />
+          
+          <div className="flex flex-col gap-10">
+            <HostProfileCard property={property} />
+            <BedroomCards sleepingDetails={property.sleepingDetails} />
+            <AmenitiesGrid amenities={property.amenities} />
+            <BookingPolicyTimeline cancellationDays={property.cancellationDays} />
+          </div>
         </div>
 
         {/* Right Sticky Booking Widget Column */}
-        <div className="lg:col-span-5 xl:col-span-4">
+        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24">
           <BookingWidget
             property={property}
             onOpenConfirmationModal={handleOpenConfirmation}

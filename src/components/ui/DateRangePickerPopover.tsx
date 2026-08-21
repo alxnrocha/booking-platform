@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, RotateCcw, Check } from 'lucide-react';
 import { formatDateRange } from '../../utils/dateFormatters.ts';
 
@@ -14,28 +14,60 @@ const monthNames = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const toDateString = (d: Date) => {
+  const y = d.getFullYear();
+  const m = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 export function DateRangePickerPopover({
   checkIn,
   checkOut,
   onSelectDates,
   onClose,
 }: DateRangePickerPopoverProps) {
-  // Parse initial month from checkIn or default to current date / June 2026
-  const initialDate = checkIn ? new Date(checkIn) : new Date(2026, 5, 1);
-  const [currentYear, setCurrentYear] = useState(initialDate.getFullYear() || 2026);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(
-    isNaN(initialDate.getMonth()) ? 5 : initialDate.getMonth()
-  );
+  // Normalize today at midnight
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  // Determine starting month from checkIn or current live date
+  const initialDate = useMemo(() => {
+    if (checkIn) {
+      const parsed = new Date(checkIn);
+      if (!isNaN(parsed.getTime()) && parsed >= today) {
+        return parsed;
+      }
+    }
+    return today;
+  }, [checkIn, today]);
+
+  const [currentYear, setCurrentYear] = useState<number>(initialDate.getFullYear());
+  const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(initialDate.getMonth());
 
   const [hoverDate, setHoverDate] = useState<string | null>(null);
-  const [tempCheckIn, setTempCheckIn] = useState<string | null>(checkIn || '2026-06-10');
-  const [tempCheckOut, setTempCheckOut] = useState<string | null>(checkOut || '2026-06-13');
+  const [tempCheckIn, setTempCheckIn] = useState<string | null>(checkIn || toDateString(today));
+  const [tempCheckOut, setTempCheckOut] = useState<string | null>(() => {
+    if (checkOut) return checkOut;
+    const defaultOut = new Date(today);
+    defaultOut.setDate(today.getDate() + 3);
+    return toDateString(defaultOut);
+  });
 
   // Next Month calculation for side-by-side view
   const nextMonthYear = currentMonthIndex === 11 ? currentYear + 1 : currentYear;
   const nextMonthIndex = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1;
 
+  // Prevent going back to past months
+  const isPastMonth =
+    currentYear < today.getFullYear() ||
+    (currentYear === today.getFullYear() && currentMonthIndex <= today.getMonth());
+
   const handlePrevMonth = () => {
+    if (isPastMonth) return;
     if (currentMonthIndex === 0) {
       setCurrentMonthIndex(11);
       setCurrentYear(currentYear - 1);
@@ -54,38 +86,45 @@ export function DateRangePickerPopover({
   };
 
   const handleDayClick = (year: number, monthIndex: number, day: number) => {
-    const m = (monthIndex + 1).toString().padStart(2, '0');
-    const d = day.toString().padStart(2, '0');
-    const dateStr = `${year}-${m}-${d}`;
-    const clickedTime = new Date(dateStr).getTime();
+    const clickedDate = new Date(year, monthIndex, day);
+    clickedDate.setHours(0, 0, 0, 0);
+
+    // Guard: ignore past days
+    if (clickedDate.getTime() < today.getTime()) {
+      return;
+    }
+
+    const dateStr = toDateString(clickedDate);
+    const clickedTime = clickedDate.getTime();
 
     if (!tempCheckIn || (tempCheckIn && tempCheckOut)) {
-      // Start new selection
+      // Start new range
       setTempCheckIn(dateStr);
       setTempCheckOut(null);
     } else if (tempCheckIn && !tempCheckOut) {
       const inTime = new Date(tempCheckIn).getTime();
       if (clickedTime < inTime) {
-        // If clicked date is before checkIn, make it the new checkIn
+        // If clicked date is earlier, make it the new check-in
         setTempCheckIn(dateStr);
       } else if (clickedTime === inTime) {
-        // Same date: 1-night stay next day
+        // Same date: 1-night stay
         const nextDay = new Date(clickedTime + 24 * 60 * 60 * 1000);
-        const nextM = (nextDay.getMonth() + 1).toString().padStart(2, '0');
-        const nextD = nextDay.getDate().toString().padStart(2, '0');
-        setTempCheckOut(`${nextDay.getFullYear()}-${nextM}-${nextD}`);
+        setTempCheckOut(toDateString(nextDay));
       } else {
-        // Complete valid range
+        // Valid check-out date
         setTempCheckOut(dateStr);
       }
     }
   };
 
   const getDayState = (year: number, monthIndex: number, day: number) => {
-    const m = (monthIndex + 1).toString().padStart(2, '0');
-    const d = day.toString().padStart(2, '0');
-    const dateStr = `${year}-${m}-${d}`;
-    const time = new Date(dateStr).getTime();
+    const dayDate = new Date(year, monthIndex, day);
+    dayDate.setHours(0, 0, 0, 0);
+    const time = dayDate.getTime();
+
+    const isPast = time < today.getTime();
+    const isToday = time === today.getTime();
+    const dateStr = toDateString(dayDate);
 
     const isStart = tempCheckIn === dateStr;
     const isEnd = tempCheckOut === dateStr;
@@ -101,7 +140,7 @@ export function DateRangePickerPopover({
       isInRange = time > inTime && time <= hTime;
     }
 
-    return { isStart, isEnd, isInRange, dateStr };
+    return { isPast, isToday, isStart, isEnd, isInRange, dateStr };
   };
 
   const calculateNights = () => {
@@ -123,13 +162,27 @@ export function DateRangePickerPopover({
     onSelectDates(null, null);
   };
 
-  const handlePreset = (monthOffset: number, startDay: number, endDay: number) => {
-    const m = (monthOffset + 1).toString().padStart(2, '0');
-    const inStr = `2026-${m}-${startDay.toString().padStart(2, '0')}`;
-    const outStr = `2026-${m}-${endDay.toString().padStart(2, '0')}`;
-    setTempCheckIn(inStr);
-    setTempCheckOut(outStr);
-    setCurrentMonthIndex(monthOffset);
+  // Dynamic presets relative to today
+  const applyPreset = (type: 'weekend' | 'week' | 'two-weeks') => {
+    const start = new Date(today);
+    const end = new Date(today);
+
+    if (type === 'weekend') {
+      // Find upcoming Friday
+      const dayOfWeek = today.getDay(); // 0 is Sunday, 5 is Friday
+      const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+      start.setDate(today.getDate() + daysUntilFriday);
+      end.setDate(start.getDate() + 2); // Friday to Sunday
+    } else if (type === 'week') {
+      end.setDate(start.getDate() + 7);
+    } else if (type === 'two-weeks') {
+      end.setDate(start.getDate() + 14);
+    }
+
+    setTempCheckIn(toDateString(start));
+    setTempCheckOut(toDateString(end));
+    setCurrentYear(start.getFullYear());
+    setCurrentMonthIndex(start.getMonth());
   };
 
   // Helper to render a single month calendar block
@@ -161,21 +214,39 @@ export function DateRangePickerPopover({
 
           {Array.from({ length: daysCount }).map((_, idx) => {
             const day = idx + 1;
-            const { isStart, isEnd, isInRange, dateStr } = getDayState(year, monthIndex, day);
+            const { isPast, isToday, isStart, isEnd, isInRange, dateStr } = getDayState(
+              year,
+              monthIndex,
+              day
+            );
+
+            if (isPast) {
+              return (
+                <div
+                  key={`day-${year}-${monthIndex}-${day}`}
+                  className="h-9 w-full flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-900/30 opacity-30 cursor-not-allowed select-none rounded-full"
+                  title="Past date"
+                >
+                  {day}
+                </div>
+              );
+            }
 
             return (
               <button
                 key={`day-${year}-${monthIndex}-${day}`}
                 onClick={() => handleDayClick(year, monthIndex, day)}
                 onMouseEnter={() => setHoverDate(dateStr)}
-                className={`h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer ${
+                className={`h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer relative ${
                   isStart
-                    ? 'bg-rose-500 text-white font-extrabold rounded-l-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
+                    ? 'bg-rose-500 text-white font-extrabold rounded-l-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400 z-10'
                     : isEnd
-                    ? 'bg-rose-500 text-white font-extrabold rounded-r-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400'
+                    ? 'bg-rose-500 text-white font-extrabold rounded-r-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400 z-10'
                     : isInRange
                     ? 'bg-rose-500/20 text-rose-200'
-                    : 'hover:bg-slate-800 text-slate-300 hover:text-white rounded-full'
+                    : isToday
+                    ? 'border border-rose-500/60 text-white font-bold rounded-full hover:bg-slate-800'
+                    : 'hover:bg-slate-800 text-slate-200 hover:text-white rounded-full'
                 }`}
               >
                 {day}
@@ -188,15 +259,15 @@ export function DateRangePickerPopover({
   };
 
   return (
-    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-6 text-white max-w-2xl lg:max-w-3xl w-full animate-in zoom-in-95">
-      {/* Header & Quick Presets */}
+    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-6 text-white max-w-2xl lg:max-w-3xl w-full animate-in zoom-in-95 relative z-[101]">
+      {/* Header & Quick Info */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-rose-500/15 text-rose-400">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2.5 rounded-xl bg-rose-500/15 text-rose-400">
             <CalendarIcon className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Select Dates</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Select Travel Dates</h4>
             <p className="text-[11px] text-slate-400 font-medium">
               {tempCheckIn && tempCheckOut
                 ? `${calculateNights()} nights selected (${formatDateRange(tempCheckIn, tempCheckOut)})`
@@ -216,25 +287,25 @@ export function DateRangePickerPopover({
         </button>
       </div>
 
-      {/* Quick Presets */}
+      {/* Dynamic Quick Presets */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <button
-          onClick={() => handlePreset(5, 12, 14)}
-          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          onClick={() => applyPreset('weekend')}
+          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          Jun 12 – 14 (Weekend)
+          Next Weekend (2 nights)
         </button>
         <button
-          onClick={() => handlePreset(7, 3, 10)}
-          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          onClick={() => applyPreset('week')}
+          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          Aug 3 – 10 (1 Week)
+          1 Week (7 nights)
         </button>
         <button
-          onClick={() => handlePreset(8, 1, 15)}
-          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          onClick={() => applyPreset('two-weeks')}
+          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          Sep 1 – 15 (2 Weeks)
+          2 Weeks (14 nights)
         </button>
       </div>
 
@@ -242,7 +313,12 @@ export function DateRangePickerPopover({
       <div className="flex items-center justify-between px-2 pt-1">
         <button
           onClick={handlePrevMonth}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer text-xs font-semibold"
+          disabled={isPastMonth}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            isPastMonth
+              ? 'opacity-30 cursor-not-allowed text-slate-600 bg-slate-900/30'
+              : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer'
+          }`}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4" />

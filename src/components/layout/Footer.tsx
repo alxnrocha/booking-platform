@@ -2,7 +2,7 @@ import { Globe, Heart, ShieldCheck, Sparkles } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-[#080C17] border-t border-slate-800/80 text-slate-400 text-xs mt-20">
+    <footer className="bg-[#080C17] border-t border-slate-800/80 text-slate-400 text-xs mt-6 md:mt-20">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>

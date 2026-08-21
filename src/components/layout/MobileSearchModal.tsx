@@ -35,6 +35,36 @@ const popularRegions: RegionItem[] = [
     image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80',
   },
   {
+    id: 'barcelona',
+    name: 'Barcelona',
+    country: 'Spain',
+    image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    id: 'madrid',
+    name: 'Madrid',
+    country: 'Spain',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    id: 'paris',
+    name: 'Paris',
+    country: 'France',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    id: 'rio',
+    name: 'Rio de Janeiro',
+    country: 'Brazil',
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=300&q=80',
+  },
+  {
+    id: 'trancoso',
+    name: 'Trancoso',
+    country: 'Brazil',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80',
+  },
+  {
     id: 'amalfi',
     name: 'Amalfi Coast',
     country: 'Italy',
@@ -45,24 +75,6 @@ const popularRegions: RegionItem[] = [
     name: 'Bali',
     country: 'Indonesia',
     image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 'costa_brava',
-    name: 'Costa Brava',
-    country: 'Spain',
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 'santorini',
-    name: 'Santorini',
-    country: 'Greece',
-    image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 'tulum',
-    name: 'Tulum',
-    country: 'Mexico',
-    image: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=300&q=80',
   },
 ];
 
