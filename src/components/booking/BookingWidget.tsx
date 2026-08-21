@@ -307,7 +307,7 @@ export function BookingWidget({
       {/* ========================================================================= */}
       {/* 2. MOBILE STICKY BOTTOM BAR (Always visible at the bottom on mobile)      */}
       {/* ========================================================================= */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1526]/95 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1526]/95 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-4 sm:px-6 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))] flex items-center justify-between">
         {/* Left price & dates summary info */}
         <div 
           onClick={() => setIsMobileExpanded(true)}
@@ -363,17 +363,17 @@ export function BookingWidget({
             className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
           />
 
-          {/* Bottom Sheet Drawer Modal */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#101726] border-t border-slate-700/90 rounded-t-[32px] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] p-5 pb-8 max-h-[85vh] overflow-y-auto lg:hidden animate-in slide-in-from-bottom duration-300 space-y-5">
+          {/* Bottom Sheet Drawer Modal - Compact and tight */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#101726] border-t border-slate-700/90 rounded-t-[28px] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] p-4 sm:p-5 pt-3 pb-[max(0.85rem,env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto lg:hidden animate-in slide-in-from-bottom duration-300 space-y-3.5">
             {/* Top Drag Pill & Header */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => setIsMobileExpanded(false)}
-                className="w-12 h-1.5 bg-slate-600 hover:bg-slate-500 rounded-full mb-3 cursor-pointer"
+                className="w-12 h-1.5 bg-slate-600 hover:bg-slate-500 rounded-full mb-2 cursor-pointer"
                 aria-label="Close summary"
               />
               
-              <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="w-full flex items-center justify-between pb-2.5 border-b border-slate-800">
                 <div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-2xl font-black text-white tracking-tight">€{property.pricePerNight}</span>
