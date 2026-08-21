@@ -1,9 +1,11 @@
+import React from 'react';
+
 interface BookingPolicyTimelineProps {
   cancellationDays: number;
 }
 
 export function BookingPolicyTimeline({ cancellationDays }: BookingPolicyTimelineProps) {
-  const steps = [
+  const steps: { num: number; title: string; desc: React.ReactNode }[] = [
     {
       num: 1,
       title: 'Book',
@@ -22,7 +24,12 @@ export function BookingPolicyTimeline({ cancellationDays }: BookingPolicyTimelin
     {
       num: 4,
       title: 'Cancellation',
-      desc: `Free cancellation up to ${cancellationDays} days`,
+      desc: (
+        <>
+          Free cancellation
+          <span className="block">up to {cancellationDays} days</span>
+        </>
+      ),
     },
   ];
 
