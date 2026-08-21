@@ -52,6 +52,37 @@ export function BookingWidget({
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Touch gesture drag state for mobile drawer
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartYRef = useRef<number | null>(null);
+  const currentDragRef = useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartYRef.current = e.touches[0].clientY;
+    currentDragRef.current = 0;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartYRef.current === null) return;
+    const deltaY = e.touches[0].clientY - touchStartYRef.current;
+    if (deltaY > 0) {
+      currentDragRef.current = deltaY;
+      setDragOffset(deltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (currentDragRef.current > 55) {
+      setIsMobileExpanded(false);
+    }
+    setDragOffset(0);
+    currentDragRef.current = 0;
+    touchStartYRef.current = null;
+    setIsDragging(false);
+  };
+
   const widgetRef = useRef<HTMLDivElement>(null);
 
   // Sync with global filter store if filter dates change
@@ -363,36 +394,47 @@ export function BookingWidget({
             className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
           />
 
-          {/* Bottom Sheet Drawer Modal - Compact and tight */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#101726] border-t border-slate-700/90 rounded-t-[28px] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] p-4 sm:p-5 pt-3 pb-[max(0.85rem,env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto lg:hidden animate-in slide-in-from-bottom duration-300 space-y-3.5">
-            {/* Top Drag Pill & Header */}
-            <div className="flex flex-col items-center">
+          {/* Bottom Sheet Drawer Modal - Live Interactive Drag & Gesture support */}
+          <div 
+            style={{
+              transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
+              transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-[#101726] border-t border-slate-700/90 rounded-t-[28px] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] p-4 sm:p-5 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] max-h-[85dvh] overflow-y-auto lg:hidden animate-in slide-in-from-bottom duration-300 space-y-3"
+          >
+            {/* Top Interactive Touch Drag Pill Area */}
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="flex flex-col items-center py-2 -mx-4 cursor-grab active:cursor-grabbing touch-none select-none"
+            >
+              <div 
+                className={`h-1.5 rounded-full transition-all duration-200 ${
+                  isDragging ? 'w-16 bg-rose-500 scale-105 shadow-[0_0_12px_rgba(244,63,94,0.8)]' : 'w-12 bg-slate-500 hover:bg-slate-400'
+                }`} 
+              />
+            </div>
+              
+            <div className="w-full flex items-center justify-between pb-2 border-b border-slate-800">
+              <div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black text-white tracking-tight">€{property.pricePerNight}</span>
+                  <span className="text-xs text-slate-400 font-medium">/ night</span>
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  {formatDisplayDate(checkIn)} to {formatDisplayDate(checkOut)} ({nights} nights)
+                </div>
+              </div>
+
+              {/* Smooth downward collapse arrow button */}
               <button
                 onClick={() => setIsMobileExpanded(false)}
-                className="w-12 h-1.5 bg-slate-600 hover:bg-slate-500 rounded-full mb-2 cursor-pointer"
-                aria-label="Close summary"
-              />
-              
-              <div className="w-full flex items-center justify-between pb-2.5 border-b border-slate-800">
-                <div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-black text-white tracking-tight">€{property.pricePerNight}</span>
-                    <span className="text-xs text-slate-400 font-medium">/ night</span>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-0.5">
-                    {formatDisplayDate(checkIn)} to {formatDisplayDate(checkOut)} ({nights} nights)
-                  </div>
-                </div>
-
-                {/* Smooth downward collapse arrow button */}
-                <button
-                  onClick={() => setIsMobileExpanded(false)}
-                  className="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-rose-400 border border-slate-700 flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all"
-                  aria-label="Collapse drawer"
-                >
-                  <ChevronDown className="w-5 h-5" />
-                </button>
-              </div>
+                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-rose-400 border border-slate-700 flex items-center justify-center cursor-pointer shadow-md active:scale-95 transition-all"
+                aria-label="Collapse drawer"
+              >
+                <ChevronDown className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Date & Guest Picker Controls */}
