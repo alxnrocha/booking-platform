@@ -37,7 +37,7 @@ export function PropertyDetailView() {
   };
 
   return (
-    <div className="max-w-[1680px] mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20 pt-4 md:pt-6 animate-in fade-in">
+    <div className="max-w-[1680px] mx-auto w-full px-6 sm:px-8 lg:px-8 pb-20 pt-4 md:pt-6 animate-in fade-in">
       
       {/* Title Bar is placed above the grid to ensure photos align with the booking widget */}
       <PropertyTitleBar property={property} />

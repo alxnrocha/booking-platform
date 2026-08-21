@@ -36,7 +36,7 @@ function getRoomMeta(roomName: string, idx: number): RoomMeta {
 
 export function BedroomCards({ sleepingDetails }: BedroomCardsProps) {
   return (
-    <div className="py-8 border-b border-slate-800/80 space-y-6">
+    <div className="py-8 border-b border-slate-800/80 space-y-6 px-1 sm:px-0">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xl font-extrabold text-white tracking-tight">

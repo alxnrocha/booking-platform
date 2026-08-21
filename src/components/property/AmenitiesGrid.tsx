@@ -29,7 +29,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export function AmenitiesGrid({ amenities }: AmenitiesGridProps) {
   return (
-    <div className="py-8 border-b border-slate-800/80 space-y-6">
+    <div className="py-8 border-b border-slate-800/80 space-y-6 px-1 sm:px-0">
       <h3 className="text-xl font-extrabold text-white tracking-tight">
         What this place offers
       </h3>
