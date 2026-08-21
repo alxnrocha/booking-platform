@@ -91,16 +91,6 @@ export function BookingWidget({
     if (filterCheckOut) setLocalCheckOut(filterCheckOut);
   }, [filterCheckIn, filterCheckOut]);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
-        setIsGuestDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const calculateNights = (inDate: string, outDate: string) => {
     if (!inDate || !outDate) return 1;
     const diff = new Date(outDate).getTime() - new Date(inDate).getTime();
@@ -173,14 +163,15 @@ export function BookingWidget({
   // Reusable Date & Guest Picker Controls
   const renderPickerControls = () => (
     <div className="space-y-2">
-      <div className="border border-slate-700/80 rounded-2xl bg-[#080D1A] divide-y divide-slate-800 overflow-hidden shadow-inner">
+      <div className="border border-slate-700/80 rounded-2xl bg-[#080D1A] divide-y divide-slate-800 shadow-inner">
         {/* Date Selector Row */}
         <button
+          type="button"
           onClick={() => {
             setIsDatePickerOpen(true);
             setIsGuestDropdownOpen(false);
           }}
-          className="w-full grid grid-cols-2 hover:bg-slate-800/40 transition-colors text-left cursor-pointer group"
+          className="w-full grid grid-cols-2 hover:bg-slate-800/40 transition-colors text-left cursor-pointer rounded-t-2xl group"
         >
           <div className="p-3.5 border-r border-slate-800">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 group-hover:text-rose-400 transition-colors">
@@ -198,12 +189,14 @@ export function BookingWidget({
         </button>
 
         {/* Guests Selector Row */}
-        <div className="relative">
+        <div className="rounded-b-2xl">
           <button
-            onClick={() => {
-              setIsGuestDropdownOpen(!isGuestDropdownOpen);
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsGuestDropdownOpen((prev) => !prev);
             }}
-            className="w-full p-3.5 text-left flex items-center justify-between hover:bg-slate-800/30 transition-colors cursor-pointer"
+            className="w-full p-3.5 text-left flex items-center justify-between hover:bg-slate-800/30 transition-colors cursor-pointer rounded-b-2xl"
           >
             <div>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
@@ -213,29 +206,43 @@ export function BookingWidget({
                 {guestsCount} {guestsCount === 1 ? 'guest' : 'guests'}
               </span>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-400" />
+            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isGuestDropdownOpen ? 'rotate-180 text-rose-400' : ''}`} />
           </button>
 
+          {/* Inline Expandable Guest Stepper */}
           {isGuestDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-[#121929] border border-slate-700 rounded-2xl p-4 shadow-2xl z-30 animate-in fade-in slide-in-from-top-1">
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="p-3.5 pt-2 pb-3.5 bg-[#121929] border-t border-slate-700/80 rounded-b-2xl animate-in fade-in duration-150"
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-bold text-white block">Guests</span>
-                  <span className="text-[10px] text-slate-400">Max {property.maxGuests} guests</span>
+                  <span className="text-xs font-bold text-white block">Number of Guests</span>
+                  <span className="text-[10px] text-slate-400">Max {property.maxGuests} guests allowed</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setGuestsCount(Math.max(1, guestsCount - 1))}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setGuestsCount(Math.max(1, guestsCount - 1));
+                    }}
                     disabled={guestsCount <= 1}
-                    className="w-8 h-8 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Decrease guests"
                   >
                     -
                   </button>
-                  <span className="text-xs font-bold text-white w-4 text-center">{guestsCount}</span>
+                  <span className="text-sm font-bold text-white w-4 text-center">{guestsCount}</span>
                   <button
-                    onClick={() => setGuestsCount(Math.min(property.maxGuests, guestsCount + 1))}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setGuestsCount(Math.min(property.maxGuests, guestsCount + 1));
+                    }}
                     disabled={guestsCount >= property.maxGuests}
-                    className="w-8 h-8 rounded-full border border-slate-700 text-white disabled:opacity-30 flex items-center justify-center text-xs cursor-pointer hover:border-slate-500"
+                    className="w-8 h-8 rounded-full border border-slate-700 hover:border-slate-500 bg-slate-800 text-white disabled:opacity-30 flex items-center justify-center text-xs font-bold cursor-pointer transition-all active:scale-95"
+                    aria-label="Increase guests"
                   >
                     +
                   </button>
