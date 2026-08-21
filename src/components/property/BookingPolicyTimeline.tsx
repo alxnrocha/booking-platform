@@ -34,7 +34,7 @@ export function BookingPolicyTimeline({ cancellationDays }: BookingPolicyTimelin
   ];
 
   return (
-    <div className="pt-8 pb-4 space-y-6 px-1 sm:px-0">
+    <div className="pt-12 pb-8 space-y-7 px-1 sm:px-0">
       <h3 className="text-xl font-extrabold text-white tracking-tight">
         Booking policy
       </h3>
