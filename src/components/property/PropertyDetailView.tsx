@@ -47,7 +47,7 @@ export function PropertyDetailView() {
         <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-10">
           <PropertyGallery property={property} />
           
-          <div className="flex flex-col gap-10 px-3 sm:px-4 lg:px-0">
+          <div className="flex flex-col px-3 sm:px-4 lg:px-0">
             <HostProfileCard property={property} />
             <BedroomCards sleepingDetails={property.sleepingDetails} />
             <AmenitiesGrid amenities={property.amenities} />
