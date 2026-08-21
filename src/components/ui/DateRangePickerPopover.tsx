@@ -192,15 +192,15 @@ export function DateRangePickerPopover({
     const offset = (dayOfWeek + 6) % 7; // Monday-start
 
     return (
-      <div className="space-y-3">
-        <div className="text-center font-bold text-sm text-white py-1">
+      <div className="space-y-2.5">
+        <div className="text-center font-bold text-sm text-white py-0.5">
           {monthNames[monthIndex]} {year}
         </div>
 
         {/* Weekday headers */}
         <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400">
           {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => (
-            <div key={d} className="py-1">
+            <div key={d} className="py-0.5">
               {d}
             </div>
           ))}
@@ -209,7 +209,7 @@ export function DateRangePickerPopover({
         {/* Days grid */}
         <div className="grid grid-cols-7 gap-y-1 gap-x-0.5">
           {Array.from({ length: offset }).map((_, idx) => (
-            <div key={`offset-${year}-${monthIndex}-${idx}`} className="h-9 w-full" />
+            <div key={`offset-${year}-${monthIndex}-${idx}`} className="h-8 sm:h-9 w-full" />
           ))}
 
           {Array.from({ length: daysCount }).map((_, idx) => {
@@ -224,7 +224,7 @@ export function DateRangePickerPopover({
               return (
                 <div
                   key={`day-${year}-${monthIndex}-${day}`}
-                  className="h-9 w-full flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-900/30 opacity-30 cursor-not-allowed select-none rounded-full"
+                  className="h-8 sm:h-9 w-full flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-900/30 opacity-30 cursor-not-allowed select-none rounded-full"
                   title="Past date"
                 >
                   {day}
@@ -237,7 +237,7 @@ export function DateRangePickerPopover({
                 key={`day-${year}-${monthIndex}-${day}`}
                 onClick={() => handleDayClick(year, monthIndex, day)}
                 onMouseEnter={() => setHoverDate(dateStr)}
-                className={`h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer relative ${
+                className={`h-8 sm:h-9 w-full flex items-center justify-center text-xs font-semibold transition-all cursor-pointer relative ${
                   isStart
                     ? 'bg-rose-500 text-white font-extrabold rounded-l-full shadow-md shadow-rose-500/30 ring-2 ring-rose-400 z-10'
                     : isEnd
@@ -259,20 +259,20 @@ export function DateRangePickerPopover({
   };
 
   return (
-    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-6 text-white max-w-2xl lg:max-w-3xl w-full animate-in zoom-in-95 relative z-[101]">
+    <div className="bg-[#151E32] border border-slate-700 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-white max-w-lg md:max-w-2xl lg:max-w-3xl w-full max-h-[90dvh] overflow-y-auto animate-in zoom-in-95 relative z-[101]">
       {/* Header & Quick Info */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2.5 rounded-xl bg-rose-500/15 text-rose-400">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="p-2 rounded-xl bg-rose-500/15 text-rose-400 flex-shrink-0">
             <CalendarIcon className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Select Travel Dates</h4>
-            <p className="text-[11px] text-slate-400 font-medium">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Select Dates</h4>
+            <p className="text-[11px] text-slate-400 font-medium truncate max-w-[200px] sm:max-w-none">
               {tempCheckIn && tempCheckOut
-                ? `${calculateNights()} nights selected (${formatDateRange(tempCheckIn, tempCheckOut)})`
+                ? `${calculateNights()} nights (${formatDateRange(tempCheckIn, tempCheckOut)})`
                 : tempCheckIn
-                ? `Check-in: ${formatDateRange(tempCheckIn, null)} · Select check-out date`
+                ? `In: ${formatDateRange(tempCheckIn, null)} · Select out`
                 : 'Select check-in date'}
             </p>
           </div>
@@ -280,7 +280,7 @@ export function DateRangePickerPopover({
 
         <button
           onClick={handleClear}
-          className="text-xs text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+          className="text-xs text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors px-2 py-1 rounded-lg hover:bg-slate-800"
         >
           <RotateCcw className="w-3 h-3" />
           <span>Clear</span>
@@ -288,50 +288,50 @@ export function DateRangePickerPopover({
       </div>
 
       {/* Dynamic Quick Presets */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         <button
           onClick={() => applyPreset('weekend')}
-          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          Next Weekend (2 nights)
+          Next Weekend (2n)
         </button>
         <button
           onClick={() => applyPreset('week')}
-          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          1 Week (7 nights)
+          1 Week (7n)
         </button>
         <button
           onClick={() => applyPreset('two-weeks')}
-          className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+          className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all cursor-pointer whitespace-nowrap"
         >
-          2 Weeks (14 nights)
+          2 Weeks (14n)
         </button>
       </div>
 
       {/* Navigation Controls Bar */}
-      <div className="flex items-center justify-between px-2 pt-1">
+      <div className="flex items-center justify-between px-1">
         <button
           onClick={handlePrevMonth}
           disabled={isPastMonth}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
             isPastMonth
               ? 'opacity-30 cursor-not-allowed text-slate-600 bg-slate-900/30'
-              : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer'
+              : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer active:scale-95'
           }`}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Previous</span>
+          <span>Prev</span>
         </button>
 
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:inline">
           Dual-Month Planner
         </span>
 
         <button
           onClick={handleNextMonth}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer text-xs font-semibold"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer text-xs font-semibold active:scale-95"
           aria-label="Next month"
         >
           <span>Next</span>
@@ -339,32 +339,32 @@ export function DateRangePickerPopover({
         </button>
       </div>
 
-      {/* Dual Month Grids Side by Side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-        {/* Left Month */}
+      {/* Single Month on Mobile, Dual Month on Desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+        {/* Primary Month (Visible on all screens) */}
         <div>{renderMonthBlock(currentYear, currentMonthIndex)}</div>
 
-        {/* Right Month */}
-        <div>{renderMonthBlock(nextMonthYear, nextMonthIndex)}</div>
+        {/* Second Month (Visible on md+ screens) */}
+        <div className="hidden md:block">{renderMonthBlock(nextMonthYear, nextMonthIndex)}</div>
       </div>
 
       {/* Footer Details & Apply Button */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+      <div className="flex items-center justify-between pt-3 border-t border-slate-800">
         <div className="text-xs">
-          <span className="text-slate-400 block text-[10px] uppercase font-bold">Selected Dates</span>
-          <span className="font-bold text-rose-400 text-sm">
+          <span className="text-slate-400 block text-[10px] uppercase font-bold">Selected</span>
+          <span className="font-bold text-rose-400 text-xs sm:text-sm">
             {tempCheckIn && tempCheckOut
               ? formatDateRange(tempCheckIn, tempCheckOut)
               : tempCheckIn
-              ? `${formatDateRange(tempCheckIn, null)} → Select checkout`
-              : 'No dates selected'}
+              ? `${formatDateRange(tempCheckIn, null)} → Select`
+              : 'No dates'}
           </span>
         </div>
 
         <button
           onClick={handleApply}
           disabled={!tempCheckIn}
-          className="flex items-center gap-1.5 px-6 py-2.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-500/30 transition-all cursor-pointer"
+          className="flex items-center gap-1.5 px-5 sm:px-6 py-2 bg-rose-500 hover:bg-rose-600 active:scale-95 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-500/30 transition-all cursor-pointer"
         >
           <Check className="w-3.5 h-3.5" />
           <span>Apply Dates</span>
