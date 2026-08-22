@@ -1,9 +1,9 @@
-﻿(function () {
-  const projectName = 'StayHub Luxury';
-  const projectUrl = 'https://alxnrocha.github.io/booking-platform/';
-  const description = 'Plataforma Multi-Tenant de Aluguel Vacacional & RBAC';
+(function () {
+  const projectName = "StayHub Luxury";
+  const projectUrl = "https://alxnrocha.github.io/booking-platform/";
+  const description = "Plataforma Multi-Tenant de Aluguel Vacacional & RBAC";
 
-  const badgeHtml = \
+  const badgeHtml = `
     <style>
       .author-project-badge {
         position: fixed;
@@ -151,7 +151,7 @@
 
     <div class="author-project-badge" id="authorProjectBadge">
       <div class="badge-header">
-        <span class="badge-title">\</span>
+        <span class="badge-title">${projectName}</span>
         <div class="badge-tag-wrap">
           <span class="badge-pill">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -170,23 +170,23 @@
       </div>
 
       <div class="badge-url">
-        <a href="\" target="_blank" rel="noopener noreferrer">\</a>
+        <a href="${projectUrl}" target="_blank" rel="noopener noreferrer">${projectUrl}</a>
       </div>
 
       <p class="badge-desc">
-        \ â€¢ Desenvolvido por <a href="https://github.com/alxnrocha" target="_blank" rel="noopener noreferrer">Alexandre Rocha (@alxnrocha)</a>
+        ${description} • Desenvolvido por <a href="https://github.com/alxnrocha" target="_blank" rel="noopener noreferrer">Alexandre Rocha (@alxnrocha)</a>
       </p>
 
       <div class="badge-footer">
         <div class="badge-status">
           <span class="badge-active"><span class="badge-dot"></span> ATIVO</span>
           <span class="badge-divider">|</span>
-          <span class="badge-branch">â‘‚ main</span>
+          <span class="badge-branch">⑂ main</span>
         </div>
         <span>Atualizado recentemente</span>
       </div>
     </div>
-  \;
+  `;
 
   document.addEventListener('DOMContentLoaded', function () {
     const container = document.createElement('div');
