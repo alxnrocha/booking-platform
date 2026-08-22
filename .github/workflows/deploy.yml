@@ -7,16 +7,21 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${ github.workflow }-${ github.ref }
   cancel-in-progress: true
 
 jobs:
-  check:
+  deploy:
     name: Lint, Test, Build & Deploy
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${ steps.deployment.outputs.page_url }
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,9 +38,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Setup Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+        id: deployment
+        uses: actions/deploy-pages@v4
