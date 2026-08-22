@@ -1,155 +1,26 @@
 # StayHub — Plataforma de Reservas de Lujo y Alquiler Vacacional Multi-Tenant con RBAC
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-success?style=flat-square&logo=github&logoColor=white)](https://alxnrocha.github.io/booking-platform/)
-[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17_Alpine-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![SQL DDL](https://img.shields.io/badge/SQL-DDL_&_Relational_Schema-00758F?style=flat-square&logo=sqlite&logoColor=white)](https://www.postgresql.org/)
-[![Prisma 6](https://img.shields.io/badge/Prisma-6.0-2D3748?style=flat-square&logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![Recharts](https://img.shields.io/badge/Recharts-3.0-22C55E?style=flat-square)](https://recharts.org/)
-[![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Zustand](https://img.shields.io/badge/Zustand-5.0-4338CA?style=flat-square)](https://github.com/pmndrs/zustand)
-[![Vitest](https://img.shields.io/badge/Tested_with-Vitest-FCC72B?style=flat-square&logo=vitest&logoColor=black)](https://vitest.dev/)
-[![Oxlint](https://img.shields.io/badge/Linter-Oxlint-orange?style=flat-square)](https://oxc.rs/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+<div align="center">
 
-> **Proyecto 15 del Portafolio Profesional** — Plataforma Multi-Tenant de alquiler vacacional y gestión de reservas de alta gama (inspirada en Airbnb / Luxury Stays) con control de acceso basado en roles (Guest / Host / Admin), motor transaccional con prevención de doble reserva, selector interactivo de fechas de doble mes, galería masonry de 5 fotos, experiencia 100% mobile-first y portal analítico para anfitriones.  
-> 🔗 **Demo en Vivo en GitHub Pages:** [https://alxnrocha.github.io/booking-platform/](https://alxnrocha.github.io/booking-platform/)
+![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-6.0-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-5.0-4338CA?style=for-the-badge)
+![Recharts](https://img.shields.io/badge/Recharts-2.15-22C55E?style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Vitest](https://img.shields.io/badge/Tested_with-Vitest-FCC72B?style=for-the-badge&logo=vitest&logoColor=black)
+![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Pages-22C55E?style=for-the-badge&logo=github&logoColor=white)
 
----
+**Plataforma Multi-Tenant de alquiler vacacional y gestión de reservas de alta gama (estilo Airbnb Luxury) con control RBAC (Guest / Host / Admin), selector de doble mes, prevención atómica de doble reserva y portal para anfitriones.**
 
-## 🌟 Visión General & Propuesta de Valor
+[🚀 Demo en Vivo](https://alxnrocha.github.io/booking-platform/) • [📂 Repositorio en GitHub](https://github.com/alxnrocha/booking-platform)
 
-**StayHub** es una aplicación integral para la exploración, reserva y gestión de estancias turísticas de lujo a nivel global:
-- **Huéspedes (Guest Experience):** Búsqueda facetada por destino, rango de fechas con visualización de dos meses simultáneos, carrusel de fotografías en alta resolución, desglose transparente de tarifas y gestión integral de viajes reservados con voucher digital.
-- **Anfitriones (Host Portal):** Panel de control con métricas clave (ingresos mensuales, ocupación, huéspedes activos y valoración), gráfico interactivo de trayectoria de facturación y matriz de disponibilidad con bloqueo de fechas por mantenimiento.
-- **Experiencia 100% Mobile-First:** Barra de búsqueda compacta para móviles, drawer modal de búsqueda a pantalla completa y barra inferior fija de navegación (*Bottom Nav*).
-- **Control de Concurrencia Relacional:** Motor de reserva atómico que previene el solapamiento de fechas (*double booking*) en tiempo real.
+</div>
 
 ---
 
-## ✨ Características Principales
-
-1. **🎨 Diseño Dark Luxury & Experiencia de Usuario:**
-   - Paleta cromática refinada con fondo Dark Slate (`#0A0F1D`, `#0F172A`), tarjetas con microbordes (`#1E293B`) y acentos en Rose Coral (`#FF385C`), Esmeralda (`#10B981`) y Oro (`#F59E0B`).
-   - Tipografía contemporánea combinando *Plus Jakarta Sans*, *Inter* y *Playfair Display*.
-   - Contenedores anchos (`max-w-[1720px]`) que aprovechan la totalidad de pantallas panorámicas.
-
-2. **🔍 Barra de Búsqueda Flotante & Selector de Doble Mes (Dual-Month):**
-   - Buscador flotante tipo pastilla con popovers integrados para **Destino** (con sugerencias de búsqueda rápida), **Rango de Fechas** y contador dinámico de **Huéspedes**.
-   - **Calendario de Doble Mes (`DateRangePickerPopover.tsx`):** Muestra dos meses consecutivos lado a lado con selección fluida de Check-in y Check-out, sombreado de rango continuo, atajos rápidos de fin de semana / semanas y formato limpio (`Jun 9 – 13`).
-   - Menú de usuario con conmutador de roles en tiempo real (**Guest Mode**, **Host / Superhost** y **Platform Admin**).
-
-3. **📱 Experiencia Móvil 100% Optimizada (< 520px):**
-   - **Pastilla de búsqueda móvil:** Acceso directo visible en cabecera en smartphones.
-   - **Modal de búsqueda móvil (`MobileSearchModal.tsx`):** Panel a pantalla completa para selección rápida de destino, fechas y huéspedes.
-   - **Barra de navegación inferior (`MobileBottomNav.tsx`):** Botones flotantes inferiores para *Explore*, *My Trips* (con badge numérico de viajes activos) y *Host Hub*.
-
-4. **🏖️ Carrusel de Categorías & Opción "All Stays":**
-   - Opción inicial **"All Stays"** que despliega todas las 8 propiedades de lujo al cargar el sitio.
-   - Barra horizontal con 10 categorías temáticas: *Beachfront, Modern Cabins, Luxury Villas, Infinity Pools, Tiny Homes, Treehouses, Design Homes, Lakefront, Ski Chalets, Amazing Views*.
-   - Modal de filtros avanzados con selector de rango de precios (€0 – €1.500+), filtro exclusivo de Superhost y conmutador de Reserva Instantánea.
-
-5. **🏡 Cuadrícula de Descubrimiento (Marketplace Grid):**
-   - Cuadrícula responsiva de 4 columnas con tarjetas interactivas: carrusel fotográfico con controles de paginación por puntos, botón de favoritos con persistencia de estado, distintivo Superhost, ubicación y precio por noche.
-
-6. **📸 Página de Detalles & Galería Masonry 5-Fotos:**
-   - Cabecera con migas de pan dinámicas, distintivo Superhost, valoraciones verificadas y acciones de Compartir y Guardar.
-   - Cuadrícula fotográfica tipo masonry (1 foto principal de impacto + 4 fotos secundarias) con modal lightbox interactivo para visualización individual o en cuadrícula.
-   - Ficha del anfitrión (*Hosted by Marco Rossi*), desglose de dormitorios (*Where you'll sleep*), cuadrícula de comodidades de lujo (Wi-Fi 500 Mbps, cargador EV, acceso al mar, etc.) y línea de tiempo de políticas de estancia.
-
-7. **💳 Motor de Reservas & Widget Dinámico:**
-   - Widget flotante con recálculo dinámico de tarifa base según noches seleccionadas, tasa de limpieza y comisión de servicio.
-   - **Prevención de Doble Reserva (Double Booking Collision):** Detección inmediata si las fechas seleccionadas ya han sido reservadas por otro huésped.
-   - Modal de confirmación con generación de voucher estilo tarjeta de embarque (*Boarding Pass*) con código único de reserva (`STAY-AMALFI-XXXX`).
-
-8. **🧳 Panel "Mis Viajes" (Guest Portal):**
-   - Gestión de reservas con filtros por estado (*All, Confirmed, Cancelled*), visualización de fechas, número de huéspedes e importe total.
-   - Flujo de cancelación con reembolso completo simulado y confirmación modal.
-
-9. **📊 Portal del Anfitrión (Host Performance Hub):**
-   - **4 Tarjetas KPI:** Ingresos Mensuales (€18.450, +14.2%), Tasa de Ocupación (88%), Reservas Activas (12 huéspedes) y Puntuación Superhost (4.96 ★).
-   - **Gráfico de Área con Recharts:** Trayectoria semestral de facturación con gradiente temático y tooltip enriquecido.
-   - **Matriz de Disponibilidad:** Calendario interactivo mensual que refleja estancias confirmadas y permite bloquear/desbloquear fechas con un solo clic.
-
----
-
-## 🏛️ Arquitectura del Proyecto
-
-```text
-15-booking-platform/
-├── .github/
-│   └── workflows/
-│       ├── ci.yml                     # Pipeline CI (Lint, Test, Build)
-│       └── deploy.yml                 # Despliegue continuo automático a GitHub Pages
-├── database/
-│   ├── schema.sql                     # DDL relacional PostgreSQL 17
-│   ├── seed.sql                       # Datos determinísticos de demostración
-│   └── README.md                      # Diagrama DER Mermaid y reglas de índices
-├── design/
-│   └── mockup_completo.png            # Referencia visual de alta fidelidad
-├── prisma/
-│   └── schema.prisma                  # Esquema Prisma 6 con modelos e índices
-├── src/
-│   ├── components/
-│   │   ├── booking/
-│   │   │   ├── BookingConfirmationModal.tsx
-│   │   │   └── BookingWidget.tsx
-│   │   ├── host/
-│   │   │   ├── AvailabilityCalendar.tsx
-│   │   │   ├── HostDashboard.tsx
-│   │   │   ├── HostKpiCards.tsx
-│   │   │   └── RevenueChart.tsx
-│   │   ├── layout/
-│   │   │   ├── AppShell.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   ├── MobileBottomNav.tsx
-│   │   │   ├── MobileSearchModal.tsx
-│   │   │   └── Navbar.tsx
-│   │   ├── marketplace/
-│   │   │   ├── CategoryFilterBar.tsx
-│   │   │   ├── FilterModal.tsx
-│   │   │   ├── PropertyCard.tsx
-│   │   │   └── PropertyGrid.tsx
-│   │   ├── property/
-│   │   │   ├── AmenitiesGrid.tsx
-│   │   │   ├── BedroomCards.tsx
-│   │   │   ├── BookingPolicyTimeline.tsx
-│   │   │   ├── HostProfileCard.tsx
-│   │   │   ├── PropertyDetailView.tsx
-│   │   │   ├── PropertyGalleryModal.tsx
-│   │   │   └── PropertyHeader.tsx
-│   │   ├── trips/
-│   │   │   └── MyTripsView.tsx
-│   │   └── ui/
-│   │       └── DateRangePickerPopover.tsx
-│   ├── data/
-│   │   └── mockData.ts                # Inmuebles, anfitriones y reservas
-│   ├── stores/
-│   │   ├── useAuthStore.ts            # Sesión RBAC (Guest / Host / Admin)
-│   │   ├── useBookingStore.ts         # Motor central de reservas y propiedades
-│   │   └── useFilterStore.ts          # Estado global de búsqueda y filtros
-│   ├── types/
-│   │   └── stayhub.ts                 # Definiciones de tipos TypeScript
-│   ├── utils/
-│   │   ├── dateFormatters.ts          # Formateador de rangos de fechas
-│   │   ├── dateFormatters.test.ts
-│   │   ├── pricing.ts                 # Cálculo de importes y comisiones
-│   │   ├── pricing.test.ts
-│   │   └── accessibility.test.ts
-│   ├── App.tsx
-│   ├── index.css                      # Variables Tailwind v4 y utilidades
-│   └── main.tsx
-├── compose.yaml                       # Docker Compose PostgreSQL 17
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
-
----
-
-## 📊 Diagrama Entidad-Relación (PostgreSQL 17 / Prisma 6)
+## 🏛️ Arquitectura y Modelo de Datos
 
 ```mermaid
 erDiagram
@@ -163,68 +34,91 @@ erDiagram
         varchar id PK
         varchar name
         varchar email UK
-        text avatar_url
         enum role "GUEST | HOST | ADMIN"
         boolean is_superhost
-        int years_hosting
         timestamp created_at
-        timestamp updated_at
     }
-
     PROPERTIES {
         varchar id PK
         varchar host_id FK
         varchar title
-        varchar subtitle
-        text description
         varchar location
         varchar country
-        varchar category
         numeric price_per_night
-        numeric cleaning_fee
-        numeric service_fee_rate
         numeric rating
-        int review_count
-        boolean is_superhost
-        int max_guests
-        int bedrooms
-        int beds
-        int baths
         jsonb images
         jsonb amenities
-        jsonb sleeping_details
-        int cancellation_days
-        boolean instant_booking
-        timestamp created_at
-        timestamp updated_at
     }
-
     RESERVATIONS {
         varchar id PK
         varchar property_id FK
         varchar guest_id FK
         date check_in
         date check_out
-        int nights
-        int guests_count
-        numeric base_price
-        numeric cleaning_fee
-        numeric service_fee
         numeric total_price
-        enum status "PENDING | CONFIRMED | CANCELLED | COMPLETED"
+        enum status
         varchar confirmation_code UK
-        timestamp created_at
-        timestamp updated_at
     }
-
     REVIEWS {
         varchar id PK
         varchar property_id FK
         varchar author_id FK
         int rating
         text comment
-        timestamp created_at
     }
+```
+
+---
+
+## ✨ Características Principales
+
+1. **🎨 Diseño Dark Luxury & Experiencia de Usuario:**
+   - Paleta cromática refinada con fondo Dark Slate (`#0A0F1D`), tarjetas con microbordes (`#1E293B`) y acentos en Rose Coral (`#FF385C`), Esmeralda (`#10B981`) y Oro (`#F59E0B`).
+   - Contenedores panorámicos (`max-w-[1720px]`) optimizados para pantallas ultra-anchas y dispositivos móviles.
+
+2. **🔍 Barra de Búsqueda Flotante & Selector de Doble Mes (Dual-Month):**
+   - Popovers integrados para Destino, Rango de Fechas (dos meses continuos) y contador dinámico de Huéspedes.
+   - Conmutador de roles en tiempo real (**Guest Mode**, **Host / Superhost** y **Platform Admin**).
+
+3. **📱 Experiencia Móvil 100% Optimizada (< 520px):**
+   - Modal de búsqueda móvil a pantalla completa y barra inferior fija de navegación (*Bottom Nav*).
+
+4. **📸 Página de Detalles & Galería Masonry 5-Fotos:**
+   - Cuadrícula fotográfica tipo masonry (1 foto principal + 4 secundarias) con modal lightbox interactivo.
+
+5. **💳 Motor de Reservas & Prevención de Doble Reserva:**
+   - Widget flotante con recálculo dinámico de tarifas, validación de fechas ocupadas y generación de voucher estilo *Boarding Pass* con código QR.
+
+6. **📊 Portal del Anfitrión (Host Hub):**
+   - Métricas clave (€18.450/mes, 88% ocupación), gráfico de ingresos con Recharts y matriz de disponibilidad con bloqueo de fechas.
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+```text
+15-booking-platform/
+├── database/
+│   ├── schema.sql                     # DDL relacional PostgreSQL 17
+│   └── seed.sql                       # Datos determinísticos de demostración
+├── prisma/
+│   └── schema.prisma                  # Esquema Prisma 6 con modelos e índices
+├── src/
+│   ├── components/
+│   │   ├── booking/                   # BookingConfirmationModal, BookingWidget
+│   │   ├── host/                      # AvailabilityCalendar, HostDashboard, RevenueChart
+│   │   ├── layout/                    # AppShell, Navbar, Footer, MobileBottomNav
+│   │   ├── marketplace/               # CategoryFilterBar, PropertyCard, PropertyGrid
+│   │   └── property/                  # PropertyDetailView, PropertyGalleryModal
+│   ├── stores/                        # useAuthStore, useBookingStore, useFilterStore
+│   ├── types/                         # Tipos TypeScript
+│   ├── App.tsx
+│   └── main.tsx
+├── tests/                             # 25 pruebas unitarias con Vitest
+├── compose.yaml                       # Docker Compose PostgreSQL 17
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
 ---
@@ -232,59 +126,48 @@ erDiagram
 ## 🚀 Instalación y Puesta en Marcha
 
 ### Prerrequisitos
-- Node.js `>= 22.0.0`
+- Node.js `>= 20.0.0`
 - npm `>= 10.0.0`
-- Docker & Docker Compose (opcional para levantar la base de datos PostgreSQL 17)
+- Docker & Docker Compose (opcional para PostgreSQL 17)
 
-### Pasos
+### Ejecución Local
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/alxnrocha/booking-platform.git
+cd booking-platform
 
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/alxnrocha/booking-platform.git
-   cd booking-platform
-   ```
+# 2. Instalar dependencias
+npm install
 
-2. **Instalar dependencias:**
-   ```bash
-   npm install
-   ```
+# 3. Iniciar contenedor de base de datos (opcional)
+docker compose up -d
 
-3. **Iniciar el contenedor de base de datos PostgreSQL 17 (Opcional):**
-   ```bash
-   docker compose up -d
-   ```
+# 4. Iniciar servidor de desarrollo
+npm run dev
 
-4. **Ejecutar en modo desarrollo:**
-   ```bash
-   npm run dev
-   ```
-   Abrir [http://localhost:5173](http://localhost:5173) en el navegador.
+# 5. Ejecutar suite de pruebas unitarias (25 tests)
+npm test
 
-5. **Ejecutar la suite de pruebas automatizadas (Vitest):**
-   ```bash
-   npm test
-   ```
-
-6. **Ejecutar el linter (Oxlint):**
-   ```bash
-   npm run lint
-   ```
-
-7. **Compilar el bundle de producción:**
-   ```bash
-   npm run build
-   ```
+# 6. Compilar para producción
+npm run build
+```
 
 ---
 
-## 🛡️ Calidad de Código & Testing
+## 🛠️ Tecnologías Utilizadas
 
-- **25 Pruebas Unitarias e Integración (Vitest):** Cobertura exhaustiva de cálculo de precios y comisiones, formateo de fechas de doble mes, prevención de colisiones de reserva (*double booking*), conmutación de roles RBAC, filtrado facetado y pruebas de accesibilidad.
-- **Oxlint:** Cero advertencias y cero errores en la totalidad del código fuente.
-- **Accesibilidad (a11y):** Semántica ARIA completa (`role="dialog"`, `aria-modal="true"`), soporte de teclado y anillos de foco visibles (`focus-visible:ring-2`).
+| Capa | Tecnología | Aspectos Clave |
+|---|---|---|
+| **Framework** | React 19 | RBAC multi-tenant, selector de fechas dual-month |
+| **Lenguaje** | TypeScript 5.8 | Tipado estricto para entidades de reserva y propiedades |
+| **Base de Datos** | PostgreSQL 17, Prisma 6 | Modelo relacional, índices B-Tree, volúmenes Docker |
+| **Estado Global** | Zustand 5.0 | Gestión de sesión RBAC y filtros de búsqueda |
+| **Visualización** | Recharts 2.15 | Curvas de ingresos de anfitrión y ocupación |
+| **Testing** | Vitest | 25 pruebas unitarias de precios y colisiones |
+| **Despliegue** | GitHub Pages | Despliegue estático continuo y optimizado |
 
 ---
 
-## 📄 Licencia
-
-Este proyecto se encuentra bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+<div align="center">
+  <sub>Desarrollado con dedicación por <a href="https://github.com/alxnrocha">Alex Rocha</a> • Proyecto 15 del Portafolio Profesional Frontend.</sub>
+</div>
