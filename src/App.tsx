@@ -1,4 +1,3 @@
-import { ProjectBadge } from './components/ProjectBadge';
 import { AppShell } from './components/layout/AppShell.tsx';
 import { CategoryFilterBar } from './components/marketplace/CategoryFilterBar.tsx';
 import { PropertyGrid } from './components/marketplace/PropertyGrid.tsx';
@@ -16,7 +15,6 @@ export default function App() {
         <div>
           <CategoryFilterBar />
           <PropertyGrid />
-              <ProjectBadge />
     </div>
       )}
 
