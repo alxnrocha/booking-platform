@@ -17,7 +17,7 @@ export const ProjectBadge: React.FC = () => {
 
   return (
     <aside
-      aria-label="Informações do Projeto"
+      aria-label="Project Information"
       style={{
         position: 'fixed',
         bottom: '16px',
@@ -50,7 +50,7 @@ export const ProjectBadge: React.FC = () => {
             href="https://github.com/alxnrocha"
             target="_blank"
             rel="noopener noreferrer"
-            title="Ver perfil de Alexandre Rocha no GitHub"
+            title="View Alexandre Rocha's GitHub profile"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', backgroundColor: '#238636', color: '#ffffff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.5px', textDecoration: 'none', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif' }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -66,8 +66,8 @@ export const ProjectBadge: React.FC = () => {
           </a>
           <button
             onClick={() => setIsVisible(false)}
-            title="Fechar (retorna em 5s)"
-            aria-label="Fechar"
+            title="Close (returns in 5s)"
+            aria-label="Close"
             style={{ background: 'transparent', border: 'none', color: '#8b949e', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -87,16 +87,14 @@ export const ProjectBadge: React.FC = () => {
 
       {/* Description */}
       <p style={{ color: '#8b949e', fontSize: '11px', lineHeight: 1.4, margin: '0 0 12px 0', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif' }}>
-        Plataforma Multi-Tenant de Aluguel Vacacional & RBAC • Desenvolvido por <a href="https://github.com/alxnrocha" target="_blank" rel="noopener noreferrer" style={{ color: '#e6edf3', fontWeight: 600, textDecoration: 'none' }}>Alexandre Rocha</a>
+        Multi-Tenant Vacation Rental & Booking Platform with RBAC • Developed by <a href="https://github.com/alxnrocha" target="_blank" rel="noopener noreferrer" style={{ color: '#e6edf3', fontWeight: 600, textDecoration: 'none' }}>Alexandre Rocha</a>
       </p>
 
       {/* Footer */}
       <footer style={{ paddingTop: '8px', borderTop: '1px solid #21262d', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px', color: '#8b949e', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ color: '#3fb950', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#238636', display: 'inline-block' }} />
-            ATIVO
-          </span>
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#238636', display: 'inline-block' }} />ACTIVE</span>
           <span style={{ color: '#484f58' }}>|</span>
           <span style={{ color: '#c9d1d9', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }}>⑂ main</span>
         </div>
