@@ -23,13 +23,13 @@ export const ProjectBadge: React.FC = () => {
         bottom: '16px',
         left: '16px',
         zIndex: 99999,
-        maxWidth: '340px',
-        width: 'calc(100vw - 32px)',
+        width: '360px',
+        maxWidth: 'calc(100vw - 32px)',
         backgroundColor: '#0d1117',
         border: '1px solid #30363d',
         borderRadius: '14px',
         padding: '16px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
         color: '#f0f6fc',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif',
         fontSize: '13px',
@@ -41,8 +41,8 @@ export const ProjectBadge: React.FC = () => {
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
-        <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif', letterSpacing: 'normal' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
+        <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif' }}>
           StayHub Luxury
         </h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
@@ -80,7 +80,7 @@ export const ProjectBadge: React.FC = () => {
 
       {/* URL Link */}
       <div style={{ marginBottom: '8px' }}>
-        <a href="https://alxnrocha.github.io/booking-platform/" target="_blank" rel="noopener noreferrer" style={{ color: '#58a6ff', textDecoration: 'underline', fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', wordBreak: 'break-all', display: 'block' }}>
+        <a href="https://alxnrocha.github.io/booking-platform/" target="_blank" rel="noopener noreferrer" style={{ color: '#58a6ff', textDecoration: 'underline', fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
           https://alxnrocha.github.io/booking-platform/
         </a>
       </div>
